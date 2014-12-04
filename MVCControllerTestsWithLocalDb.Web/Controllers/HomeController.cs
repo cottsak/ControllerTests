@@ -1,17 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
+using MVCControllerTestsWithLocalDb.Web.Models;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace MVCControllerTestsWithLocalDb.Web.Controllers
 {
     public class HomeController : Controller
     {
-        // GET: Home
+        private readonly ISession _session;
+
+        public HomeController(ISession session)
+        {
+            _session = session;
+        }
+
         public ActionResult Index()
         {
-            return View();
+            var ics = _session.Query<IntegratedCircuit>().ToList();
+            return View(ics);
         }
     }
 }

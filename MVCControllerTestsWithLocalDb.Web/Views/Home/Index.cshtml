@@ -1,1 +1,17 @@
-﻿<h1>hi from matt</h1>
+﻿@model IEnumerable<IntegratedCircuit>
+
+<h1>hi from matt</h1>
+
+@if (!Model.Any())
+{
+    <div>There are no items to show.</div>
+}
+
+<ul>
+    @foreach (var ic in Model)
+    {
+        <li>
+            @ic.Code - @ic.Description
+        </li>
+    }
+</ul>
