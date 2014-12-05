@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace MVCControllerTestsWithLocalDb.Web
@@ -11,6 +7,7 @@ namespace MVCControllerTestsWithLocalDb.Web
     {
         protected void Application_Start()
         {
+            ContainerConfig.SetupDependencyInjection();
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
