@@ -15,7 +15,7 @@ namespace MVCControllerTestsWithLocalDb.Web.Helpers
                 return new HtmlString(string.Empty);
 
             var e = useInlineElement ? "span" : "p";
-            var cssSelector = (alert.Item2 == AlertType.Alert) ? string.Empty : "-" + alert.Item2.ToString().ToLower();
+            var cssSelector = "-" + alert.Item2.ToString().ToLower();
             var result = string.Format("<{0} class='alert alert{1}'>{2}</{0}>", e, cssSelector, alert.Item1);
             helper.ViewContext.TempData[PageAlertTempDataKey] = null;
             return new HtmlString(result);
@@ -36,9 +36,9 @@ namespace MVCControllerTestsWithLocalDb.Web.Helpers
 
     public enum AlertType
     {
-        Alert,
+        Warning,
         Info,
         Success,
-        Error
+        Danger
     }
 }

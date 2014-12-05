@@ -26,12 +26,18 @@ namespace MVCControllerTestsWithLocalDb.Web.Controllers
         [HttpPost]
         public ActionResult CreateIC(string code, string description)
         {
+            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(description))
+            {
+                AddPageAlert("IC was not added: please fill the whole form.");
+                return RedirectToAction("Index");
+            }
+
             _session.Save(new IntegratedCircuit { Code = code, Description = description });
             AddPageAlert("IC added successfully.", AlertType.Success);
             return RedirectToAction("Index");
         }
 
-        protected void AddPageAlert(string message, AlertType type = AlertType.Alert)
+        protected void AddPageAlert(string message, AlertType type = AlertType.Warning)
         {
             TempData[PageAlertHelper.PageAlertTempDataKey] = Tuple.Create(message, type);
         }
