@@ -4,9 +4,9 @@ namespace MVCControllerTestsWithLocalDb.Web.Models
 {
     public class IntegratedCircuit
     {
-        public virtual int Id { get; protected set; }
-        public virtual string Code { get; protected set; }
-        public virtual string Description { get; protected set; }
+        public virtual int Id { get; set; }
+        public virtual string Code { get; set; }
+        public virtual string Description { get; set; }
     }
 
     class IntegratedCircuitMap : ClassMap<IntegratedCircuit>
