@@ -9,7 +9,7 @@ namespace MVCControllerTestsWithLocalDb.Web
 {
     static class ContainerConfig
     {
-        static IContainer BuildContainer()
+        internal static IContainer BuildContainer()
         {
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyModules(typeof(ContainerConfig).Assembly);

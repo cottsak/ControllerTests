@@ -4,3 +4,6 @@
 */obj
 /packages
 *.user
+*.ncrunchproject
+/*.ncrunchsolution
+*_NCrunch*
