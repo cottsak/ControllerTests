@@ -20,8 +20,6 @@ namespace MVCControllerTestsWithLocalDb.Tests
         [Test]
         public void Given3ICs_WhenGetIndex_ThenAll3ICsAreReturned()
         {
-            PurgeICTable();
-
             new[]
             {
                 new IntegratedCircuit {Code = "1", Description = "Test1"},
@@ -39,8 +37,6 @@ namespace MVCControllerTestsWithLocalDb.Tests
         [Test]
         public void GivenNoICs_WhenPostCreateIC_ThenStoreContainsNewIC()
         {
-            PurgeICTable();
-
             const string newIcCode = "556";
             const string newIcDescription = "dual timer";
 
@@ -50,19 +46,18 @@ namespace MVCControllerTestsWithLocalDb.Tests
             newIc.Code.ShouldBe(newIcCode);
             newIc.Description.ShouldBe(newIcDescription);
         }
-
-        private void PurgeICTable()
-        {
-            // todo: remove this once using LocalDB as there should be no initial state in this table
-            var existingIcs = Session.Query<IntegratedCircuit>().ToList();
-            existingIcs.ForEach(ic => Session.Delete(ic));
-        }
     }
 
     [ExclusivelyUses("db-transaction")]     // don't run these transaction db tests in parallel else deadlocks
     internal class MVCControllerTest<TController> where TController : Controller
     {
         private HttpSimulator _httpRequest;
+
+        [TestFixtureSetUp]
+        public void RunDbupOnLocalDB()
+        {
+            Db.Program.Main(new[] { Config.DatabaseConnectionString });
+        }
 
         [SetUp]
         public void Setup()
@@ -72,12 +67,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
             _httpRequest = new HttpSimulator().SimulateRequest();
 
-            //var routes = new RouteCollection();
-            //RouteConfig.RegisterRoutes(routes);
             Controller = LifetimeScope.Resolve<TController>();
-            //Controller.ControllerContext = new ControllerContext(new HttpContextWrapper(HttpContext.Current), new RouteData(), controller);
-            //Controller.Url = new UrlHelper(Controller.Request.RequestContext, routes);
-
             Session = LifetimeScope.Resolve<ISession>();
             Session.BeginTransaction();
         }

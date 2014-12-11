@@ -7,7 +7,7 @@ namespace MVCControllerTestsWithLocalDb.Db
 {
     class Program
     {
-        static int Main(string[] args)
+        internal static int Main(string[] args)
         {
             var connectionString =
                 args.FirstOrDefault() ?? @"Server=.\sqlexpress; Database=MVCControllerTestsWithLocalDb; Trusted_connection=true";
