@@ -17,7 +17,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
     class HomeControllerTests : MVCControllerTest<HomeController>
     {
         [Test]
-        public void WhenGetIndex_ThenAViewIsReturned()
+        public void Given3ICs_WhenGetIndex_ThenAll3ICsAreReturned()
         {
             // todo: remove this once using LocalDB as there should be no initial state in this table
             PurgeICTable();
