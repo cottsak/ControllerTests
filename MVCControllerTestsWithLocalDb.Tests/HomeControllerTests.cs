@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using Autofac;
@@ -9,15 +10,15 @@ using MVCControllerTestsWithLocalDb.Web.Models;
 using NCrunch.Framework;
 using NHibernate;
 using NHibernate.Linq;
-using NUnit.Framework;
 using Shouldly;
 using Subtext.TestLibrary;
+using Xunit;
 
 namespace MVCControllerTestsWithLocalDb.Tests
 {
-    class HomeControllerTests : MVCControllerTest<HomeController>
+    public class HomeControllerTests : MVCControllerTest<HomeController>
     {
-        [Test]
+        [Fact]
         public void Given3ICs_WhenGetIndex_ThenAll3ICsAreReturned()
         {
             new[]
@@ -34,7 +35,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
             model.Last().Description.ShouldBe("Test3");
         }
 
-        [Test]
+        [Fact]
         public void GivenNoICs_WhenPostCreateIC_ThenStoreContainsNewIC()
         {
             const string newIcCode = "556";
@@ -49,18 +50,17 @@ namespace MVCControllerTestsWithLocalDb.Tests
     }
 
     [ExclusivelyUses("db-transaction")]     // don't run these transaction db tests in parallel else deadlocks
-    internal class MVCControllerTest<TController> where TController : Controller
+    public class MVCControllerTest<TController> : IDisposable where TController : Controller
     {
-        private HttpSimulator _httpRequest;
+        private bool _disposed;
+        private readonly HttpSimulator _httpRequest;
 
-        [TestFixtureSetUp]
-        public void RunDbupOnLocalDB()
+        static MVCControllerTest()
         {
             Db.Program.Main(new[] { Config.DatabaseConnectionString });
         }
 
-        [SetUp]
-        public void Setup()
+        public MVCControllerTest()
         {
             var container = ContainerConfig.BuildContainer();
             LifetimeScope = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
@@ -76,11 +76,29 @@ namespace MVCControllerTestsWithLocalDb.Tests
         protected ILifetimeScope LifetimeScope { get; private set; }
         protected ISession Session { get; private set; }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
-            LifetimeScope.Dispose();    // tear down transaction to release locks
-            _httpRequest.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~MVCControllerTest()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                LifetimeScope.Dispose();    // tear down transaction to release locks
+                _httpRequest.Dispose();
+            }
+
+            _disposed = true;
         }
     }
 }
