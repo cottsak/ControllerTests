@@ -50,7 +50,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
     }
 
     [ExclusivelyUses("db-transaction")]     // don't run these transaction db tests in parallel else deadlocks
-    public class MVCControllerTest<TController> : IDisposable where TController : Controller
+    public abstract class MVCControllerTest<TController> : IDisposable where TController : Controller
     {
         private bool _disposed;
         private readonly HttpSimulator _httpRequest;
