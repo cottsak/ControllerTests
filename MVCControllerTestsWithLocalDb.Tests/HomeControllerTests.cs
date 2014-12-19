@@ -94,7 +94,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
             if (disposing)
             {
-                LifetimeScope.Dispose();    // tear down transaction to release locks
+                Session.Transaction.Dispose();  // tear down transaction to release locks
                 _httpRequest.Dispose();
             }
 
