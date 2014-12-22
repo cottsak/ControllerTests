@@ -16,7 +16,7 @@
         <li>
             @ic.Code - @ic.Description
             <span class="delete">(<a href="#remove@(ic.Id)" 
-                onclick="postSimpleForm('@Url.Action("DeleteIC", new { id=ic.Id })', 'really delete this IC?');" style="color: red;">remove?</a>)</span>
+                onclick="ajaxDeleteAndRemove('/api/deleteic/' + @ic.Id, 'really delete this IC?', $(this).closest('li'));" style="color: red;">remove?</a>)</span>
         </li>
     }
 </ul>
@@ -44,10 +44,10 @@
 </div>
 
 <script type="text/javascript">
-    function postSimpleForm(url, confirmMessage) {
+    function ajaxDeleteAndRemove(url, confirmMessage, selectorToRemove) {
         if (confirm(confirmMessage)) {
-            var form = $("<form method='post' action='" + url + "'></form>");
-            form.appendTo("body").submit();
+            $.ajax({ url: url, type: "POST" })
+            .done(function() { selectorToRemove.remove(); });
         }
     }
 </script>

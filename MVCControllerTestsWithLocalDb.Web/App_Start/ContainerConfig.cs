@@ -29,6 +29,7 @@ namespace MVCControllerTestsWithLocalDb.Web
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterControllers(ThisAssembly);
+            builder.RegisterApiControllers(ThisAssembly);
             builder.RegisterModule(new AutofacWebTypesModule());
 
             RegisterDatabaseComponents(builder);

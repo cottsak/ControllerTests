@@ -1,13 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCControllerTestsWithLocalDb.Web", "MVCControllerTestsWithLocalDb.Web\MVCControllerTestsWithLocalDb.Web.csproj", "{2D598F58-E295-41AC-90F1-84877E12B0A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCControllerTestsWithLocalDb.Db", "MVCControllerTestsWithLocalDb.Db\MVCControllerTestsWithLocalDb.Db.csproj", "{A8310E35-C29D-4DCB-8506-0F0F7084BC59}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVCControllerTestsWithLocalDb.Tests", "MVCControllerTestsWithLocalDb.Tests\MVCControllerTestsWithLocalDb.Tests.csproj", "{1A42DD54-1F5D-4F80-8284-50EA7867A4D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F83C07F1-5931-4F6D-AA69-63C9F32D674E}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

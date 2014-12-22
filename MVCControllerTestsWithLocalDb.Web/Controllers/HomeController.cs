@@ -41,14 +41,5 @@ namespace MVCControllerTestsWithLocalDb.Web.Controllers
         {
             TempData[PageAlertHelper.PageAlertTempDataKey] = Tuple.Create(message, type);
         }
-
-        // todo: now make this a webapi call
-        [HttpPost]
-        public ActionResult DeleteIC(int id)
-        {
-            var ic = _session.Load<IntegratedCircuit>(id);
-            _session.Delete(ic);
-            return RedirectToAction("Index");
-        }
     }
 }
