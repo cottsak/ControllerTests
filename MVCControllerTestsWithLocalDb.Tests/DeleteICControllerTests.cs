@@ -1,11 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
+using System.Web.Http;
+using Autofac;
+using Autofac.Core.Lifetime;
+using Autofac.Integration.WebApi;
+using MVCControllerTestsWithLocalDb.Db;
+using MVCControllerTestsWithLocalDb.Web;
 using MVCControllerTestsWithLocalDb.Web.Models;
+using NCrunch.Framework;
+using Newtonsoft.Json;
 using NHibernate;
 using NHibernate.Linq;
 using Shouldly;
@@ -29,18 +35,76 @@ namespace MVCControllerTestsWithLocalDb.Tests
         }
     }
 
+    [ExclusivelyUses(NCrunchSingleThreadForDb)]     // don't run these transaction db tests in parallel else deadlocks
     public abstract class ApiControllerTest : IDisposable
     {
+        public const string NCrunchSingleThreadForDb = "db-transaction";
+
+        private const string MediaType = "application/json";
+
+        private bool _disposed;
+        private readonly HttpServer _httpServer;
+        private readonly Uri _baseUri = new Uri("http://localhost");
+
+        static ApiControllerTest()
+        {
+            Program.Main(new[] { Config.DatabaseConnectionString });
+        }
+
+        protected ApiControllerTest()
+        {
+            var container = ContainerConfig.BuildContainer();
+            var lts = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
+
+            var config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(container) };
+            WebApiConfig.Register(config);
+            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+            _httpServer = new HttpServer(config);
+
+            Session = lts.Resolve<ISession>();
+            Session.BeginTransaction();
+        }
+
         protected ISession Session { get; private set; }
 
         protected HttpResponseMessage Post(string relativeUrl, object content)
         {
-            throw new NotImplementedException();
+            var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_baseUri, relativeUrl));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
+            request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, MediaType);
+
+            var response = new HttpClient(_httpServer).SendAsync(request).Result;
+
+            // for debugging
+            if (response.StatusCode == HttpStatusCode.InternalServerError)
+                Console.WriteLine("response.StatusCode == 500\r\nDetails:\r\n{0}\r\n", response.Content.ReadAsStringAsync().Result);
+
+            return response;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ApiControllerTest()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                Session.Transaction.Dispose();  // tear down transaction to release locks
+                _httpServer.Dispose();
+            }
+
+            _disposed = true;
         }
     }
 }

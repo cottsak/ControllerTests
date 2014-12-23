@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using MVCControllerTestsWithLocalDb.Web.Models;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace MVCControllerTestsWithLocalDb.Web.Controllers
 {
@@ -18,7 +20,11 @@ namespace MVCControllerTestsWithLocalDb.Web.Controllers
 
         public HttpResponseMessage Post(int id)
         {
-            var ic = _session.Load<IntegratedCircuit>(id);
+            var ic = _session.Query<IntegratedCircuit>().SingleOrDefault(i => i.Id == id);
+
+            if (ic == null)
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+
             _session.Delete(ic);
             return new HttpResponseMessage(HttpStatusCode.OK);
         }

@@ -49,7 +49,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
         }
     }
 
-    [ExclusivelyUses("db-transaction")]     // don't run these transaction db tests in parallel else deadlocks
+    [ExclusivelyUses(ApiControllerTest.NCrunchSingleThreadForDb)]     // don't run these transaction db tests in parallel else deadlocks
     public abstract class MVCControllerTest<TController> : IDisposable where TController : Controller
     {
         private bool _disposed;
@@ -60,7 +60,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
             Db.Program.Main(new[] { Config.DatabaseConnectionString });
         }
 
-        public MVCControllerTest()
+        protected MVCControllerTest()
         {
             var container = ContainerConfig.BuildContainer();
             var lts = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
