@@ -63,17 +63,16 @@ namespace MVCControllerTestsWithLocalDb.Tests
         public MVCControllerTest()
         {
             var container = ContainerConfig.BuildContainer();
-            LifetimeScope = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
+            var lts = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
 
             _httpRequest = new HttpSimulator().SimulateRequest();
 
-            Controller = LifetimeScope.Resolve<TController>();
-            Session = LifetimeScope.Resolve<ISession>();
+            Controller = lts.Resolve<TController>();
+            Session = lts.Resolve<ISession>();
             Session.BeginTransaction();
         }
 
         protected TController Controller { get; private set; }
-        protected ILifetimeScope LifetimeScope { get; private set; }
         protected ISession Session { get; private set; }
 
         public void Dispose()
