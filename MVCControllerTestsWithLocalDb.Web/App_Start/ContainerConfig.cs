@@ -37,13 +37,19 @@ namespace MVCControllerTestsWithLocalDb.Web
 
         private void RegisterDatabaseComponents(ContainerBuilder builder)
         {
-            builder.Register(context => NhibernateConfig.CreateSessionFactory().OpenSession())
+            builder.Register(context =>
+            {
+                var newSession = NhibernateConfig.CreateSessionFactory().OpenSession();
+                return newSession;
+            })
                 .As<ISession>()
                 .InstancePerRequest()
                 .OnRelease(session =>
                     {
                         if (session.IsDirty())
-                            session.Flush();        // deletes won't work without explicit .Flush()
+                            session.Flush(); // deletes won't work without explicit .Flush()
+
+                        session.Dispose();      // todo: update blog post with this line
                     });
         }
     }

@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Autofac;
-using Autofac.Core.Lifetime;
 using Autofac.Integration.WebApi;
 using MVCControllerTestsWithLocalDb.Db;
 using MVCControllerTestsWithLocalDb.Web;
@@ -43,6 +42,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
         private const string MediaType = "application/json";
 
         private bool _disposed;
+        private readonly HttpConfiguration _config;
         private readonly HttpServer _httpServer;
         private readonly Uri _baseUri = new Uri("http://localhost");
 
@@ -54,15 +54,14 @@ namespace MVCControllerTestsWithLocalDb.Tests
         protected ApiControllerTest()
         {
             var container = ContainerConfig.BuildContainer();
-            var lts = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
 
-            var config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(container) };
-            WebApiConfig.Register(config);
-            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
-            _httpServer = new HttpServer(config);
+            _config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(container) };
+            WebApiConfig.Register(_config);
+            _config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+            _httpServer = new HttpServer(_config);
 
-            Session = lts.Resolve<ISession>();
-            Session.BeginTransaction();
+            Session = _config.DependencyResolver.BeginScope().GetRequestLifetimeScope().Resolve<ISession>();
+            //Session.BeginTransaction();
         }
 
         protected ISession Session { get; private set; }
@@ -79,6 +78,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
             if (response.StatusCode == HttpStatusCode.InternalServerError)
                 Console.WriteLine("response.StatusCode == 500\r\nDetails:\r\n{0}\r\n", response.Content.ReadAsStringAsync().Result);
 
+            request.GetDependencyScope().Dispose(); // force the disposal of the request lifetimescope for .Flush()
             return response;
         }
 
@@ -100,8 +100,9 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
             if (disposing)
             {
-                Session.Transaction.Dispose();  // tear down transaction to release locks
+                //Session.Transaction.Dispose();  // tear down transaction to release locks
                 _httpServer.Dispose();
+                _config.Dispose();
             }
 
             _disposed = true;
