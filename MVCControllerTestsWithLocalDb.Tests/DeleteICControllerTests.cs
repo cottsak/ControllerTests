@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,6 +47,8 @@ namespace MVCControllerTestsWithLocalDb.Tests
         private readonly HttpConfiguration _config;
         private readonly HttpServer _httpServer;
         private readonly Uri _baseUri = new Uri("http://localhost");
+        protected IDbConnection _conn;
+        private IDbTransaction _tx;
 
         static ApiControllerTest()
         {
@@ -53,9 +57,27 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
         protected ApiControllerTest()
         {
-            var container = ContainerConfig.BuildContainer();
+            _conn = new SqlConnection(@"Server=.\sqlexpress; Database=MVCControllerTestsWithLocalDb; Trusted_connection=true");
+            _conn.Open();
+            //var cmd=_conn.CreateCommand();
+            _tx = _conn.BeginTransaction();
 
-            _config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(container) };
+            var container = ContainerConfig.BuildContainer();
+            var rootScope = container.BeginLifetimeScope(builder =>
+                {
+                    // this re-registration is to allow the injection of a common transaction for both the
+                    // ISession in the test Arrange and Assert as well as the Controller (Act)
+                    builder.Register(context =>
+                    {
+                        var newSession = NhibernateConfig.CreateSessionFactory().OpenSession(_conn);
+                        return newSession;
+                    })
+                        .As<ISession>()
+                        .InstancePerRequest()
+                        .OnRelease(NhibernateConfig.FlushSession);
+                });
+
+            _config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(rootScope) };
             WebApiConfig.Register(_config);
             _config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             _httpServer = new HttpServer(_config);
@@ -100,6 +122,8 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
             if (disposing)
             {
+                _tx.Rollback();
+                _conn.Dispose();
                 //Session.Transaction.Dispose();  // tear down transaction to release locks
                 _httpServer.Dispose();
                 _config.Dispose();
