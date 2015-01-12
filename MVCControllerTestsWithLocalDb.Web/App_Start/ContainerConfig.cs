@@ -37,14 +37,9 @@ namespace MVCControllerTestsWithLocalDb.Web
 
         private void RegisterDatabaseComponents(ContainerBuilder builder)
         {
-            builder.Register(context =>
-            {
-                var newSession = NhibernateConfig.CreateSessionFactory().OpenSession();
-                return newSession;
-            })
+            builder.Register(context => NhibernateConfig.CreateSessionFactory().OpenSession())
                 .As<ISession>()
-                .InstancePerRequest()
-                .OnRelease(NhibernateConfig.FlushSession);
+                .InstancePerRequest();
         }
     }
 }

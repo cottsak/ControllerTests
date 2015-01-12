@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -47,8 +45,6 @@ namespace MVCControllerTestsWithLocalDb.Tests
         private readonly HttpConfiguration _config;
         private readonly HttpServer _httpServer;
         private readonly Uri _baseUri = new Uri("http://localhost");
-        protected IDbConnection _conn;
-        private IDbTransaction _tx;
 
         static ApiControllerTest()
         {
@@ -57,24 +53,14 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
         protected ApiControllerTest()
         {
-            _conn = new SqlConnection(@"Server=.\sqlexpress; Database=MVCControllerTestsWithLocalDb; Trusted_connection=true");
-            _conn.Open();
-            //var cmd=_conn.CreateCommand();
-            _tx = _conn.BeginTransaction();
-
             var container = ContainerConfig.BuildContainer();
             var rootScope = container.BeginLifetimeScope(builder =>
                 {
-                    // this re-registration is to allow the injection of a common transaction for both the
-                    // ISession in the test Arrange and Assert as well as the Controller (Act)
-                    builder.Register(context =>
-                    {
-                        var newSession = NhibernateConfig.CreateSessionFactory().OpenSession(_conn);
-                        return newSession;
-                    })
+                    // changing the ISession to a singleton so that the two ISession Resolve() calls
+                    // produce the same instance such that the transaction includes all test activity.
+                    builder.Register(context => NhibernateConfig.CreateSessionFactory().OpenSession())
                         .As<ISession>()
-                        .InstancePerRequest()
-                        .OnRelease(NhibernateConfig.FlushSession);
+                        .SingleInstance();
                 });
 
             _config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(rootScope) };
@@ -83,7 +69,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
             _httpServer = new HttpServer(_config);
 
             Session = _config.DependencyResolver.BeginScope().GetRequestLifetimeScope().Resolve<ISession>();
-            //Session.BeginTransaction();
+            Session.BeginTransaction();
         }
 
         protected ISession Session { get; private set; }
@@ -122,9 +108,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
             if (disposing)
             {
-                _tx.Rollback();
-                _conn.Dispose();
-                //Session.Transaction.Dispose();  // tear down transaction to release locks
+                Session.Transaction.Dispose();  // tear down transaction to release locks
                 _httpServer.Dispose();
                 _config.Dispose();
             }

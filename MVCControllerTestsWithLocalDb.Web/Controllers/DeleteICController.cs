@@ -26,6 +26,7 @@ namespace MVCControllerTestsWithLocalDb.Web.Controllers
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
 
             _session.Delete(ic);
+            _session.Flush();
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
     }
