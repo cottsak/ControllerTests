@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -31,6 +32,27 @@ namespace MVCControllerTestsWithLocalDb.Tests
 
             result.StatusCode.ShouldBe(HttpStatusCode.OK);
             Session.Query<IntegratedCircuit>().ShouldBeEmpty();
+        }
+
+        [Fact]
+        public void GivenASetOfICs_WhenRemovingASpecificOne_ThenOnlyThatOneIsMissing()
+        {
+            new[]
+            {
+                new IntegratedCircuit {Code = "1", Description = "Test1"},
+                new IntegratedCircuit {Code = "2", Description = "Test2"},
+                new IntegratedCircuit {Code = "3", Description = "Test3"},
+            }.ForEach(ic => Session.Save(ic));
+            Session.Flush();
+            var ic2 = Session.Query<IntegratedCircuit>().Single(i => i.Code == "2");
+
+            var result = Post("/api/deleteic/" + ic2.Id, new { });
+
+            result.StatusCode.ShouldBe(HttpStatusCode.OK);
+            var allRemainingICs = Session.Query<IntegratedCircuit>().ToList();
+            allRemainingICs.Count().ShouldBe(2);
+            allRemainingICs[0].Description.ShouldBe("Test1");
+            allRemainingICs[1].Description.ShouldBe("Test3");
         }
     }
 
