@@ -12,6 +12,6 @@ Demo for mvc controller and webapi in-memory tests against a localdb mdf
 
 ### But it's not about the web site
 
-This app demonstrates the ease in which one can create solid end-to-end tests against both MVC and WebApi controllers with minimum infrastructore code. The gold are the tests in `HomeControllerTests.cs` and `DeleteICControllerTests.cs` along with the supporting infrastructure in `MVCControllerTest.cs` and `ApiControllerTest.cs`.
+This app demonstrates the ease in which one can create solid end-to-end tests against both MVC and WebApi controllers with minimum infrastructure code. The gold are the tests in `HomeControllerTests.cs` and `DeleteICControllerTests.cs` along with the supporting infrastructure in `MVCControllerTest.cs` and `ApiControllerTest.cs`.
 
 Please leave me feedback via pull requests, issues or hitting me up at [@mattkocaj](https://twitter.com/mattkocaj).
