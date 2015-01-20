@@ -41,5 +41,22 @@ namespace MVCControllerTestsWithLocalDb.Tests
             newIc.Code.ShouldBe(newIcCode);
             newIc.Description.ShouldBe(newIcDescription);
         }
+
+        [Fact]
+        public void Given3ICs_WhenDeleteICsWithAll3Ids_ThenTheStoreIsEmpty()
+        {
+            var newICs = new[]
+            {
+                new IntegratedCircuit {Code = "1", Description = "Test1"},
+                new IntegratedCircuit {Code = "2", Description = "Test2"},
+                new IntegratedCircuit {Code = "3", Description = "Test3"},
+            };
+            newICs.ForEach(ic => Session.Save(ic));
+            Session.Flush();
+
+            InvokeAction(c => c.DeleteICs(newICs.Select(i => i.Id).ToArray()));
+
+            Session.Query<IntegratedCircuit>().Count().ShouldBe(0);
+        }
     }
 }

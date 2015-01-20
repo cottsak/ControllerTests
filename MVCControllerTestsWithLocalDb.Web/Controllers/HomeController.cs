@@ -41,5 +41,31 @@ namespace MVCControllerTestsWithLocalDb.Web.Controllers
         {
             TempData[PageAlertHelper.PageAlertTempDataKey] = Tuple.Create(message, type);
         }
+
+        public ActionResult DeleteICs()
+        {
+            var ics = _session.Query<IntegratedCircuit>().ToList();
+            return View(ics);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteICs(int[] idsToDelete)
+        {
+            if (idsToDelete == null)
+            {
+                AddPageAlert("Please select at least one IC to delete");
+                return DeleteICs();
+            }
+
+            foreach (var icId in idsToDelete)
+            {
+                var ic = _session.Query<IntegratedCircuit>().Single(i => i.Id == icId);
+                _session.Delete(ic);
+            }
+
+            AddPageAlert(string.Format("{0} ICs deleted successfully.", idsToDelete.Count()), AlertType.Success);
+
+            return RedirectToAction("Index");
+        }
     }
 }
