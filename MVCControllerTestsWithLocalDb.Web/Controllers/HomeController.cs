@@ -57,11 +57,8 @@ namespace MVCControllerTestsWithLocalDb.Web.Controllers
                 return DeleteICs();
             }
 
-            foreach (var icId in idsToDelete)
-            {
-                var ic = _session.Query<IntegratedCircuit>().Single(i => i.Id == icId);
-                _session.Delete(ic);
-            }
+            var icsToDelete = _session.Query<IntegratedCircuit>().Where(i => idsToDelete.Contains(i.Id));
+            icsToDelete.ForEach(ic => _session.Delete(ic));
 
             AddPageAlert(string.Format("{0} ICs deleted successfully.", idsToDelete.Count()), AlertType.Success);
 
