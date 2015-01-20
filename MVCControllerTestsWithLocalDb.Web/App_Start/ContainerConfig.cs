@@ -39,7 +39,13 @@ namespace MVCControllerTestsWithLocalDb.Web
         {
             builder.Register(context => NhibernateConfig.CreateSessionFactory().OpenSession())
                 .As<ISession>()
-                .InstancePerRequest();
+                .InstancePerRequest()
+                .OnRelease(session =>
+                    {
+                        NhibernateConfig.CompleteRequest(session);
+
+                        session.Dispose();
+                    });
         }
     }
 }

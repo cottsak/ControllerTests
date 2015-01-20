@@ -64,7 +64,9 @@ namespace MVCControllerTestsWithLocalDb.Tests.Helpers
             if (response.StatusCode == HttpStatusCode.InternalServerError)
                 Console.WriteLine("response.StatusCode == 500\r\nDetails:\r\n{0}\r\n", response.Content.ReadAsStringAsync().Result);
 
-            request.GetDependencyScope().Dispose(); // force the disposal of the request lifetimescope for .Flush()
+            NhibernateConfig.CompleteRequest(Session);
+            Session.Clear();    // this is to ensure we don't get ghost results from the NHibernate cache
+
             return response;
         }
 

@@ -23,7 +23,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
             }.ForEach(ic => Session.Save(ic));
             Session.Flush();
 
-            var model = (IEnumerable<IntegratedCircuit>)((ViewResult)Controller.Index()).Model;
+            var model = (IEnumerable<IntegratedCircuit>)((ViewResult)InvokeAction(c => c.Index())).Model;
 
             model.Count().ShouldBe(3);
             model.Last().Description.ShouldBe("Test3");
@@ -35,7 +35,7 @@ namespace MVCControllerTestsWithLocalDb.Tests
             const string newIcCode = "556";
             const string newIcDescription = "dual timer";
 
-            Controller.CreateIC(newIcCode, newIcDescription);
+            InvokeAction(c => c.CreateIC(newIcCode, newIcDescription));
 
             var newIc = Session.Query<IntegratedCircuit>().Single();
             newIc.Code.ShouldBe(newIcCode);

@@ -14,6 +14,7 @@ namespace MVCControllerTestsWithLocalDb.Tests.Helpers
     {
         private bool _disposed;
         private readonly HttpSimulator _httpRequest;
+        private readonly TController _controller;
 
         static MVCControllerTest()
         {
@@ -27,13 +28,22 @@ namespace MVCControllerTestsWithLocalDb.Tests.Helpers
 
             _httpRequest = new HttpSimulator().SimulateRequest();
 
-            Controller = lts.Resolve<TController>();
+            _controller = lts.Resolve<TController>();
             Session = lts.Resolve<ISession>();
             Session.BeginTransaction();
         }
 
-        protected TController Controller { get; private set; }
         protected ISession Session { get; private set; }
+
+        protected ActionResult InvokeAction(Func<TController, ActionResult> action)
+        {
+            var result = action(_controller);
+
+            NhibernateConfig.CompleteRequest(Session);
+            Session.Clear();    // this is to ensure we don't get ghost results from the NHibernate cache
+
+            return result;
+        }
 
         public void Dispose()
         {
