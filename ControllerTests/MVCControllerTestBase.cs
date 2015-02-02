@@ -7,7 +7,7 @@ using Subtext.TestLibrary;
 
 namespace ControllerTests
 {
-    [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]     // don't run these transaction db tests in parallel else deadlocks
+    [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]   // don't run these transaction db tests in parallel else deadlocks
     public abstract class MvcControllerTestBase<TController, TSession> : IDisposable where TController : Controller
     {
         private bool _disposed;
@@ -80,6 +80,7 @@ namespace ControllerTests
             if (container == null)
                 throw new ArgumentNullException("container", "A real container must be supplied to setup tests");
             Container = container;
+
             SessionSetup = sessionSetup;
             SessionTeardown = sessionTeardown;
             PostControllerAction = postControllerAction;

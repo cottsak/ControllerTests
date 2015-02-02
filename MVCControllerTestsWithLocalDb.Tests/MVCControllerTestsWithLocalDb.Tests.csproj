@@ -129,8 +129,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeleteICControllerTests.cs" />
-    <Compile Include="Helpers\ApiControllerTest.cs" />
     <Compile Include="Helpers\MVCControllerTest.cs" />
+    <Compile Include="Helpers\ApiControllerTest.cs" />
     <Compile Include="HomeControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
