@@ -10,11 +10,11 @@ namespace ControllerTests
     [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]     // don't run these transaction db tests in parallel else deadlocks
     public abstract class MvcControllerTestBase<TController, TSession> : IDisposable where TController : Controller
     {
-        private readonly MvcTestSetup<TSession> _setup;
         private bool _disposed;
         private readonly HttpSimulator _httpRequest;
         private readonly TController _controller;
         protected readonly TSession Session;
+        private readonly MvcTestSetup<TSession> _setup;
 
         protected MvcControllerTestBase(MvcTestSetup<TSession> setup)
         {
