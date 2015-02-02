@@ -10,7 +10,7 @@ using Xunit;
 
 namespace MVCControllerTestsWithLocalDb.Tests
 {
-    public class HomeControllerTests : MVCControllerTest<HomeController>
+    public class HomeControllerTests : MvcControllerTest<HomeController>
     {
         [Fact]
         public void Given3ICs_WhenGetIndex_ThenAll3ICsAreReturned()

@@ -139,6 +139,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ControllerTests\ControllerTests.csproj">
+      <Project>{f0f3890b-bfbf-4c7c-9336-d2a1abd5a285}</Project>
+      <Name>ControllerTests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MVCControllerTestsWithLocalDb.Db\MVCControllerTestsWithLocalDb.Db.csproj">
       <Project>{a8310e35-c29d-4dcb-8506-0f0f7084bc59}</Project>
       <Name>MVCControllerTestsWithLocalDb.Db</Name>
