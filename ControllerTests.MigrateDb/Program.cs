@@ -10,7 +10,7 @@ namespace ControllerTests.MigrateDb
         internal static int Main(string[] args)
         {
             var connectionString =
-                args.FirstOrDefault() ?? @"Server=.\sqlexpress; Database=MVCControllerTestsWithLocalDb; Trusted_connection=true";
+                args.FirstOrDefault() ?? @"Server=.\sqlexpress; Database=ControllerTests.Web; Trusted_connection=true";
 
             var upgrader =
                 DeployChanges.To
