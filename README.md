@@ -1,6 +1,6 @@
-# mem-int-tests-localdb
+# ControllerTests
 
-Demo for mvc controller and webapi in-memory tests against a localdb mdf 
+A package to simplify end-to-end testing for MVC and WebApi controllers while supporting legacy db schemas.
 
 ### Get the web site running
 
