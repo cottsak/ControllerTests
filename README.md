@@ -1,4 +1,4 @@
-# ControllerTests
+# ControllerTests [![Build status](https://ci.appveyor.com/api/projects/status/bii5w35ktguwd29u?svg=true)](https://ci.appveyor.com/project/cottsak/controllertests)
 
 A package to simplify end-to-end testing for MVC and WebApi controllers while supporting legacy db schemas.
 
