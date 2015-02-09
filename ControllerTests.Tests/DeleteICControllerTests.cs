@@ -11,6 +11,11 @@ using Xunit;
 
 namespace ControllerTests.Tests
 {
+    // tests are failing with the db on AppVeyor: https://ci.appveyor.com/project/cottsak/controllertests
+
+    // will prob have to attach the files with a script and use the App.Release.config connection string for the SQL
+    // instance on the build box
+
     public class DeleteIcControllerTests : ApiControllerTestBase<ISession>
     {
         static DeleteIcControllerTests()
