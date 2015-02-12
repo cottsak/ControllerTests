@@ -6,3 +6,4 @@
 *.ncrunchproject
 /*.ncrunchsolution
 *_NCrunch*
+/scripts/run.cmd
