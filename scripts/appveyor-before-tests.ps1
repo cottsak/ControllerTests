@@ -8,4 +8,5 @@ $doc.Save($config)
 # attach mdf to local instance
 $mdfFile = join-path $startPath "store.mdf"
 $ldfFile = join-path $startPath "store_log.ldf"
-sqlcmd -S .\SQL2014 -U sa -P Password12! -Q "sp_attach_db 'ControllerTests.Web', '$mdfFile', '$ldfFile'"
+#sqlcmd -S .\SQL2014 -U sa -P Password12! -Q "sp_attach_db 'ControllerTests.Web', '$mdfFile', '$ldfFile'"
+sqlcmd -S "(local)\SQL2012SP1" -Q "Use [master]; CREATE DATABASE [ControllerTests.Web] ON (FILENAME = '$mdfFile'),(FILENAME = '$ldfFile') for ATTACH"
