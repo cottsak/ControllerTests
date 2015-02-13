@@ -41,14 +41,24 @@ namespace ControllerTests.Tests
         { }
 
         [Fact]
-        public void GivenNoIcsInStore_WhenPost_ThenAnIcIsPresentInStoreAndTheIdIsReturned()
+        public void GivenNoIcsInStore_WhenPost_ThenIcIsCreatedInStoreAndURIAndRepresentationAreReturned()
         {
+            const string code = "7805";
+            const string description = "5v linear regulator";
             Session.Query<IntegratedCircuit>().Count().ShouldBe(0);
 
-            var response = Post("/api/ics", new { code = "7805", description = "5v linear regulator" });
+            var response = Post("/api/ics", new { code, description });
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.BodyAs<int>().ShouldBeGreaterThan(0);
+            var ic = Session.Query<IntegratedCircuit>().First();
+            ic.Code.ShouldBe(code);
+            ic.Description.ShouldBe(description);
+
+            response.Headers.Location.PathAndQuery.ShouldBe(string.Format("/api/ics/{0}", ic.Id));
+
+            response.BodyAs<string>().ShouldContain(ic.Id.ToString());
+            response.BodyAs<string>().ShouldContain(code);
+            response.BodyAs<string>().ShouldContain(description);
         }
     }
 }

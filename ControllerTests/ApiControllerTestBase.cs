@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -49,7 +50,7 @@ namespace ControllerTests
 
             // for debugging
             if (response.StatusCode == HttpStatusCode.InternalServerError)
-                Console.WriteLine("response.StatusCode == 500\r\nDetails:\r\n{0}\r\n", response.Content.ReadAsStringAsync().Result);
+                Console.WriteLine("\r\nresponse.StatusCode == 500\r\nDetails:\r\n{0}\r\n", response.Content.ReadAsStringAsync().Result);
 
             if (_setup.PostControllerAction != null)
                 _setup.PostControllerAction(Session);
@@ -88,7 +89,9 @@ namespace ControllerTests
     {
         public static T BodyAs<T>(this HttpResponseMessage response)
         {
-            throw new NotImplementedException();
+            if (typeof(T) == typeof(string))
+                return (T)(object)response.Content.ReadAsStringAsync().Result;
+            return response.Content.ReadAsAsync<T>().Result;
         }
     }
 
