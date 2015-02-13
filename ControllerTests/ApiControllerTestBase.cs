@@ -84,6 +84,14 @@ namespace ControllerTests
         }
     }
 
+    public static class ApiControllerTestExtentions
+    {
+        public static T BodyAs<T>(this HttpResponseMessage response)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ApiTestSetup<TSession>
     {
         public ApiTestSetup(IContainer container,

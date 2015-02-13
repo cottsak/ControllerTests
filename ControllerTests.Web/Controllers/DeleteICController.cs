@@ -8,6 +8,7 @@ using NHibernate.Linq;
 
 namespace ControllerTests.Web.Controllers
 {
+    // todo: change this to a 'IC' resource and use a DELETE verb
     public class DeleteICController : ApiController
     {
         private readonly ISession _session;
