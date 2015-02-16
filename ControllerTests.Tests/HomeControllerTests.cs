@@ -4,9 +4,11 @@ using System.Web.Mvc;
 using ControllerTests.MigrateDb;
 using ControllerTests.Web;
 using ControllerTests.Web.Controllers;
+using ControllerTests.Web.Helpers;
 using ControllerTests.Web.Models;
 using NHibernate;
 using NHibernate.Linq;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -22,12 +24,12 @@ namespace ControllerTests.Tests
         public HomeControllerTests()
             : base(new MvcTestSetup<ISession>(
                 ContainerConfig.BuildContainer(),
-                session => session.BeginTransaction(),
-                session => session.Transaction.Dispose(),    // tear down transaction to release locks
-                session =>
+                sessionSetup: session => session.BeginTransaction(),
+                sessionTeardown: session => session.Transaction.Dispose(), // tear down transaction to release locks
+                postControllerAction: session =>
                 {
                     NhibernateConfig.CompleteRequest(session);
-                    session.Clear();    // this is to ensure we don't get ghost results from the NHibernate cache
+                    session.Clear(); // this is to ensure we don't get ghost results from the NHibernate cache
                 }
                 ))
         { }
@@ -65,6 +67,8 @@ namespace ControllerTests.Tests
         [Fact]
         public void Given3ICs_WhenDeleteICsWithAll3Ids_ThenTheStoreIsEmpty()
         {
+            ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(true);
+
             var newICs = new[]
             {
                 new IntegratedCircuit {Code = "1", Description = "Test1"},

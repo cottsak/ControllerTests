@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,10 +15,10 @@ namespace ControllerTests
     public abstract class ApiControllerTestBase<TSession> : IDisposable
     {
         private bool _disposed;
-        private readonly HttpServer _httpServer;
+        private readonly Lazy<HttpServer> _httpServer;
         private const string MediaType = "application/json";
         private readonly Uri _baseUri = new Uri("http://localhost");
-        protected readonly TSession Session;
+        private TSession _session;
         private readonly ApiTestSetup<TSession> _setup;
 
         protected ApiControllerTestBase(ApiTestSetup<TSession> setup)
@@ -28,16 +27,50 @@ namespace ControllerTests
                 throw new ArgumentException("Please initialise the test class by creating a constructor and passing the setup argument to base()", "setup");
             _setup = setup;
 
-            var rootScope = setup.Container.BeginLifetimeScope(setup.AdditionalConfig);
+            _httpServer = new Lazy<HttpServer>(() =>
+            {
+                var rootScope = setup.Container.BeginLifetimeScope(setup.AdditionalConfig);
 
-            var config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(rootScope) };
-            setup.RegisterWebApiConfig(config);
-            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
-            _httpServer = new HttpServer(config);
+                var config = new HttpConfiguration { DependencyResolver = new AutofacWebApiDependencyResolver(rootScope) };
+                setup.RegisterWebApiConfig(config);
+                config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
-            Session = rootScope.Resolve<TSession>();
-            if (setup.SessionSetup != null)
-                setup.SessionSetup(Session);
+                _session = rootScope.Resolve<TSession>();
+                if (setup.SessionSetup != null)
+                    setup.SessionSetup(_session);
+
+                return new HttpServer(config);
+            });
+
+        }
+
+        protected void ConfigureServices(Action<ContainerBuilder> config)
+        {
+            if (_httpServer.IsValueCreated)
+                throw new InvalidOperationException("Can not configure after the server has been initialised. Always ConfigureServices before using the Session member.");
+
+            _setup.AdditionalConfig += config;
+        }
+
+        protected T ConfigureService<T>() where T : class
+        {
+            var sub = NSubstitute.Substitute.For<T>();
+            ConfigureServices(builder => builder.Register(context => sub).As<T>());
+            return sub;
+        }
+
+        protected TSession Session
+        {
+            get
+            {
+                if (!_httpServer.IsValueCreated)
+                {
+                    var initServer = _httpServer.Value;
+                }
+
+                return _session;
+            }
+            set { _session = value; }
         }
 
         protected HttpResponseMessage Post(string relativeUrl, object content)
@@ -46,7 +79,7 @@ namespace ControllerTests
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
             request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, MediaType);
 
-            var response = new HttpClient(_httpServer).SendAsync(request).Result;
+            var response = new HttpClient(_httpServer.Value).SendAsync(request).Result;
 
             // for debugging
             if (response.StatusCode == HttpStatusCode.InternalServerError)
@@ -78,7 +111,7 @@ namespace ControllerTests
             {
                 if (_setup.SessionTeardown != null)
                     _setup.SessionTeardown(Session);
-                _httpServer.Dispose();
+                _httpServer.Value.Dispose();
             }
 
             _disposed = true;
@@ -118,11 +151,11 @@ namespace ControllerTests
             PostControllerAction = postControllerAction;
         }
 
-        public IContainer Container { get; private set; }
-        public Action<HttpConfiguration> RegisterWebApiConfig { get; private set; }
-        public Action<ContainerBuilder> AdditionalConfig { get; private set; }
-        public Action<TSession> SessionSetup { get; private set; }
-        public Action<TSession> SessionTeardown { get; private set; }
-        public Action<TSession> PostControllerAction { get; private set; }
+        internal IContainer Container { get; private set; }
+        internal Action<HttpConfiguration> RegisterWebApiConfig { get; private set; }
+        internal Action<ContainerBuilder> AdditionalConfig { get; set; }
+        internal Action<TSession> SessionSetup { get; private set; }
+        internal Action<TSession> SessionTeardown { get; private set; }
+        internal Action<TSession> PostControllerAction { get; private set; }
     }
 }

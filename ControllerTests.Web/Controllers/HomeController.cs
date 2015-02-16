@@ -11,10 +11,12 @@ namespace ControllerTests.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ISession _session;
+        private readonly IDevAccessChecker _devAccessChecker;
 
-        public HomeController(ISession session)
+        public HomeController(ISession session, IDevAccessChecker devAccessChecker)
         {
             _session = session;
+            _devAccessChecker = devAccessChecker;
         }
 
         public ActionResult Index()
@@ -51,6 +53,9 @@ namespace ControllerTests.Web.Controllers
         [HttpPost]
         public ActionResult DeleteICs(int[] idsToDelete)
         {
+            if (!_devAccessChecker.UserHasDevAccess())
+                return new HttpNotFoundResult();
+
             if (idsToDelete == null)
             {
                 AddPageAlert("Please select at least one IC to delete");

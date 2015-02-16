@@ -3,6 +3,12 @@
 
 <h2>Select ICs to Delete</h2>
 
+@{
+    // todo: add cookie logic
+    var cookieLink = "#";
+}
+<div class="alert alert-warning">This page requires a dev cookie. Create the cookie by navigating to <a href="@cookieLink">the dev cookie page</a>.</div>
+
 @Html.RenderPageAlert()
 
 @if (!Model.Any())

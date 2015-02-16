@@ -3,9 +3,11 @@ using System.Net;
 using Autofac;
 using ControllerTests.MigrateDb;
 using ControllerTests.Web;
+using ControllerTests.Web.Helpers;
 using ControllerTests.Web.Models;
 using NHibernate;
 using NHibernate.Linq;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -41,8 +43,9 @@ namespace ControllerTests.Tests
         { }
 
         [Fact]
-        public void GivenNoIcsInStore_WhenPost_ThenIcIsCreatedInStoreAndURIAndRepresentationAreReturned()
+        public void GivenDevAccessAndNoIcsInStore_WhenPost_ThenIcIsCreatedInStoreAndURIAndRepresentationAreReturned()
         {
+            ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(true);
             const string code = "7805";
             const string description = "5v linear regulator";
             Session.Query<IntegratedCircuit>().Count().ShouldBe(0);
