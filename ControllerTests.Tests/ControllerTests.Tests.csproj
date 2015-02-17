@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeleteICControllerTests.cs" />
+    <Compile Include="DevAccessResourceTests.cs" />
     <Compile Include="HomeControllerTests.cs" />
     <Compile Include="IcResourceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

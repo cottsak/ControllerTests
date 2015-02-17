@@ -11,6 +11,15 @@ using Newtonsoft.Json;
 
 namespace ControllerTests
 {
+    // todo: create a NoSession version for MvcControllerTestBase
+    public abstract class ApiControllerTestBase : ApiControllerTestBase<NoSession>
+    {
+        protected ApiControllerTestBase(ApiTestSetup setup)
+            : base(new ApiTestSetup<NoSession>(setup))
+        { }
+    }
+    public class NoSession { }
+
     [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]   // don't run these transaction db tests in parallel else deadlocks
     public abstract class ApiControllerTestBase<TSession> : IDisposable
     {
@@ -35,13 +44,15 @@ namespace ControllerTests
                 setup.RegisterWebApiConfig(config);
                 config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
-                _session = rootScope.Resolve<TSession>();
-                if (setup.SessionSetup != null)
-                    setup.SessionSetup(_session);
+                if (typeof(TSession) != typeof(NoSession))
+                {
+                    _session = rootScope.Resolve<TSession>();
+                    if (setup.SessionSetup != null)
+                        setup.SessionSetup(_session);
+                }
 
                 return new HttpServer(config);
             });
-
         }
 
         protected void ConfigureServices(Action<ContainerBuilder> config)
@@ -73,23 +84,11 @@ namespace ControllerTests
             set { _session = value; }
         }
 
+        protected HttpResponseMessage Get(string relativeUrl)
+        { return SendMessage(HttpMethod.Get, relativeUrl); }
+
         protected HttpResponseMessage Post(string relativeUrl, object content)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_baseUri, relativeUrl));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
-            request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, MediaType);
-
-            var response = new HttpClient(_httpServer.Value).SendAsync(request).Result;
-
-            // for debugging
-            if (response.StatusCode == HttpStatusCode.InternalServerError)
-                Console.WriteLine("\r\nresponse.StatusCode == 500\r\nDetails:\r\n{0}\r\n", response.Content.ReadAsStringAsync().Result);
-
-            if (_setup.PostControllerAction != null)
-                _setup.PostControllerAction(Session);
-
-            return response;
-        }
+        { return SendMessage(HttpMethod.Post, relativeUrl, content); }
 
         public void Dispose()
         {
@@ -116,6 +115,26 @@ namespace ControllerTests
 
             _disposed = true;
         }
+
+        private HttpResponseMessage SendMessage(HttpMethod method, string relativeUrl, object content = null)
+        {
+            var request = new HttpRequestMessage(method, new Uri(_baseUri, relativeUrl));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
+            if (content != null)
+                request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, MediaType);
+
+            var response = new HttpClient(_httpServer.Value).SendAsync(request).Result;
+
+            // for debugging
+            if (response.StatusCode == HttpStatusCode.InternalServerError)
+                Console.WriteLine("\r\nresponse.StatusCode == 500\r\nDetails:\r\n{0}\r\n",
+                    response.Content.ReadAsStringAsync().Result);
+
+            if (_setup.PostControllerAction != null)
+                _setup.PostControllerAction(Session);
+
+            return response;
+        }
     }
 
     public static class ApiControllerTestExtentions
@@ -128,7 +147,7 @@ namespace ControllerTests
         }
     }
 
-    public class ApiTestSetup<TSession>
+    public class ApiTestSetup<TSession> : ApiTestSetup
     {
         public ApiTestSetup(IContainer container,
             Action<HttpConfiguration> registerWebApiConfig,
@@ -136,6 +155,27 @@ namespace ControllerTests
             Action<TSession> sessionSetup = null,
             Action<TSession> sessionTeardown = null,
             Action<TSession> postControllerAction = null)
+            : base(container, registerWebApiConfig, additionalConfig)
+        {
+            SessionSetup = sessionSetup;
+            SessionTeardown = sessionTeardown;
+            PostControllerAction = postControllerAction;
+        }
+
+        internal ApiTestSetup(ApiTestSetup setup)
+            : base(setup.Container, setup.RegisterWebApiConfig, setup.AdditionalConfig)
+        { }
+
+        internal Action<TSession> SessionSetup { get; private set; }
+        internal Action<TSession> SessionTeardown { get; private set; }
+        internal Action<TSession> PostControllerAction { get; private set; }
+    }
+
+    public class ApiTestSetup
+    {
+        public ApiTestSetup(IContainer container,
+            Action<HttpConfiguration> registerWebApiConfig,
+            Action<ContainerBuilder> additionalConfig = null)
         {
             if (container == null)
                 throw new ArgumentNullException("container", "A real container must be supplied to setup tests");
@@ -146,16 +186,10 @@ namespace ControllerTests
             RegisterWebApiConfig = registerWebApiConfig;
 
             AdditionalConfig = additionalConfig ?? (builder => { });
-            SessionSetup = sessionSetup;
-            SessionTeardown = sessionTeardown;
-            PostControllerAction = postControllerAction;
         }
 
         internal IContainer Container { get; private set; }
         internal Action<HttpConfiguration> RegisterWebApiConfig { get; private set; }
         internal Action<ContainerBuilder> AdditionalConfig { get; set; }
-        internal Action<TSession> SessionSetup { get; private set; }
-        internal Action<TSession> SessionTeardown { get; private set; }
-        internal Action<TSession> PostControllerAction { get; private set; }
     }
 }
