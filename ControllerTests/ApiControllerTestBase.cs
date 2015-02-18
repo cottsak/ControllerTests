@@ -3,15 +3,16 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
 using NCrunch.Framework;
 using Newtonsoft.Json;
+using NSubstitute;
 
 namespace ControllerTests
 {
-    // todo: create a NoSession version for MvcControllerTestBase
     public abstract class ApiControllerTestBase : ApiControllerTestBase<NoSession>
     {
         protected ApiControllerTestBase(ApiTestSetup setup)
@@ -52,7 +53,7 @@ namespace ControllerTests
                 }
 
                 return new HttpServer(config);
-            });
+            }, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         protected void ConfigureServices(Action<ContainerBuilder> config)
@@ -65,7 +66,7 @@ namespace ControllerTests
 
         protected T ConfigureService<T>() where T : class
         {
-            var sub = NSubstitute.Substitute.For<T>();
+            var sub = Substitute.For<T>();
             ConfigureServices(builder => builder.Register(context => sub).As<T>());
             return sub;
         }
