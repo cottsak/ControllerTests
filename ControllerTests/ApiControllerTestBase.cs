@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
@@ -19,19 +18,24 @@ namespace ControllerTests
             : base(new ApiTestSetup<NoSession>(setup))
         { }
     }
-    public class NoSession { }
+    public class NoSession { }      // todo: should this be internal?
 
     [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]   // don't run these transaction db tests in parallel else deadlocks
     public abstract class ApiControllerTestBase<TSession> : IDisposable
     {
         private bool _disposed;
-        private readonly Lazy<HttpServer> _httpServer;
+        private Lazy<HttpServer> _httpServer;
         private const string MediaType = "application/json";
         private readonly Uri _baseUri = new Uri("http://localhost");
         private TSession _session;
-        private readonly ApiTestSetup<TSession> _setup;
+        private ApiTestSetup<TSession> _setup;
 
         protected ApiControllerTestBase(ApiTestSetup<TSession> setup)
+        {
+            Init(setup);
+        }
+
+        protected void Init(ApiTestSetup<TSession> setup)
         {
             if (setup == null)
                 throw new ArgumentException("Please initialise the test class by creating a constructor and passing the setup argument to base()", "setup");
@@ -53,7 +57,7 @@ namespace ControllerTests
                 }
 
                 return new HttpServer(config);
-            }, LazyThreadSafetyMode.ExecutionAndPublication);
+            });
         }
 
         protected void ConfigureServices(Action<ContainerBuilder> config)

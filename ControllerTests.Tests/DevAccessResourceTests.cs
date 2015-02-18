@@ -3,8 +3,8 @@ using ControllerTests.MigrateDb;
 using ControllerTests.Web;
 using ControllerTests.Web.Helpers;
 using NSubstitute;
+using NUnit.Framework;
 using Shouldly;
-using Xunit;
 
 namespace ControllerTests.Tests
 {
@@ -15,11 +15,28 @@ namespace ControllerTests.Tests
             Program.Main(new[] { Config.DatabaseConnectionString });
         }
 
-        public DevAccessResourceTests()
-            : base(new ApiTestSetup(ContainerConfig.BuildContainer(), WebApiConfig.Register))
-        { }
+        #region NUnit overhead
 
-        [Fact]
+        private static readonly ApiTestSetup<NoSession> DevAccessResourceTestsSetup =
+            new ApiTestSetup<NoSession>(ContainerConfig.BuildContainer(), WebApiConfig.Register);
+
+        public DevAccessResourceTests() : base(DevAccessResourceTestsSetup) { }
+
+        [SetUp]
+        public void Setup()
+        {
+            this.Init(DevAccessResourceTestsSetup);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            this.Dispose();
+        }
+
+        #endregion
+
+        [Test]
         public void WhenDevAccessIsPresent_WhenGet_ThenResultIs200()
         {
             ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(true);
@@ -27,7 +44,7 @@ namespace ControllerTests.Tests
             Get("/api/devaccess").StatusCode.ShouldBe((HttpStatusCode)200);
         }
 
-        [Fact]
+        [Test]
         public void WhenDevAccessIsNotPresent_WhenGet_ThenResultIs403()
         {
             ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(false);
