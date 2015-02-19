@@ -16,6 +16,7 @@ This app demonstrates the ease in which one can create solid end-to-end tests ag
 
 Please leave me feedback via pull requests, issues or hitting me up at [@mattkocaj](https://twitter.com/mattkocaj).
 
-### Future
+### Package
 
-I am in the process of extracting the common infrastructure elements of this project into a nuget assembly which I plan to release shortly.
+[`Install-Package mk.ControllerTests`](https://www.nuget.org/packages/mk.ControllerTests/)
+
