@@ -67,7 +67,7 @@ namespace ControllerTests.Tests
         [Fact]
         public void Given3ICs_WhenDeleteICsWithAll3Ids_ThenTheStoreIsEmpty()
         {
-            ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(true);
+            SubstituteAndConfigure<IDevAccessChecker>().UserHasDevAccess().Returns(true);
 
             var newICs = new[]
             {

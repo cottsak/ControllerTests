@@ -45,7 +45,7 @@ namespace ControllerTests.Tests
         [Fact]
         public void GivenDevAccessAndNoIcsInStore_WhenPost_ThenIcIsCreatedInStoreAndURIAndRepresentationAreReturned()
         {
-            ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(true);
+            SubstituteAndConfigure<IDevAccessChecker>().UserHasDevAccess().Returns(true);
             const string code = "7805";
             const string description = "5v linear regulator";
             Session.Query<IntegratedCircuit>().Count().ShouldBe(0);

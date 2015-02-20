@@ -68,7 +68,7 @@ namespace ControllerTests
             _setup.AdditionalConfig += config;
         }
 
-        protected T ConfigureService<T>() where T : class
+        protected T SubstituteAndConfigure<T>() where T : class
         {
             var sub = Substitute.For<T>();
             ConfigureServices(builder => builder.Register(context => sub).As<T>());

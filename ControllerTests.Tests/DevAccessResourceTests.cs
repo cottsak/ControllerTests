@@ -39,7 +39,7 @@ namespace ControllerTests.Tests
         [Test]
         public void WhenDevAccessIsPresent_WhenGet_ThenResultIs200()
         {
-            ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(true);
+            SubstituteAndConfigure<IDevAccessChecker>().UserHasDevAccess().Returns(true);
 
             Get("/api/devaccess").StatusCode.ShouldBe((HttpStatusCode)200);
         }
@@ -47,7 +47,7 @@ namespace ControllerTests.Tests
         [Test]
         public void WhenDevAccessIsNotPresent_WhenGet_ThenResultIs403()
         {
-            ConfigureService<IDevAccessChecker>().UserHasDevAccess().Returns(false);
+            SubstituteAndConfigure<IDevAccessChecker>().UserHasDevAccess().Returns(false);
 
             Get("/api/devaccess").StatusCode.ShouldBe((HttpStatusCode)403);
         }
