@@ -24,4 +24,5 @@ Please leave me feedback via pull requests, issues or hitting me up at [@mattkoc
 
 * what are the exciting bits/real value?
 * show usage examples first
+* explain that NCrunch `[ExclusivelyUses("db-transaction")]` may be required for MSSQL and similar 'transaction isolation' implementations
 

@@ -2,12 +2,10 @@
 using System.Web.Mvc;
 using Autofac;
 using Autofac.Core.Lifetime;
-using NCrunch.Framework;
 using Subtext.TestLibrary;
 
 namespace ControllerTests
 {
-    [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]   // don't run these transaction db tests in parallel else deadlocks
     public abstract class MvcControllerTestBase<TController, TSession> : IDisposable where TController : Controller
     {
         private bool _disposed;

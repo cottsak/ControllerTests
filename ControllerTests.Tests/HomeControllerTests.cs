@@ -6,6 +6,7 @@ using ControllerTests.Web;
 using ControllerTests.Web.Controllers;
 using ControllerTests.Web.Helpers;
 using ControllerTests.Web.Models;
+using NCrunch.Framework;
 using NHibernate;
 using NHibernate.Linq;
 using NSubstitute;
@@ -14,8 +15,11 @@ using Xunit;
 
 namespace ControllerTests.Tests
 {
+    [ExclusivelyUses(SingleThreadForDb)]
     public class HomeControllerTests : MvcControllerTestBase<HomeController, ISession>
     {
+        public const string SingleThreadForDb = "db-transaction";
+
         static HomeControllerTests()
         {
             Program.Main(new[] { Config.DatabaseConnectionString });

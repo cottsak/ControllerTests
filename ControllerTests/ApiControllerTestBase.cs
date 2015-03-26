@@ -6,7 +6,6 @@ using System.Text;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
-using NCrunch.Framework;
 using Newtonsoft.Json;
 using NSubstitute;
 
@@ -20,7 +19,6 @@ namespace ControllerTests
     }
     public class NoSession { }      // todo: should this be internal?
 
-    [ExclusivelyUses(NCrunchConstants.SingleThreadForDb)]   // don't run these transaction db tests in parallel else deadlocks
     public abstract class ApiControllerTestBase<TSession> : IDisposable
     {
         private bool _disposed;

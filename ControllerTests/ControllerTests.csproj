@@ -45,10 +45,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="NCrunch.Framework, Version=2.8.0.34, Culture=neutral, PublicKeyToken=01d101bf6f3e0aea, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NCrunch.Framework.2.8.0.34\lib\portable-windows8+net45\NCrunch.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -103,7 +99,6 @@
   <ItemGroup>
     <Compile Include="ApiControllerTestBase.cs" />
     <Compile Include="MVCControllerTestBase.cs" />
-    <Compile Include="NCrunchConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
