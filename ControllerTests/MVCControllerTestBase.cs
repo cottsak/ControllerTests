@@ -25,12 +25,12 @@ namespace ControllerTests
             _controller = new Lazy<TController>(() =>
             {
                 var container = setup.Container;
-                var lts = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag, setup.AdditionalConfig);
+                var requestScope = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag, setup.AdditionalConfig);
 
                 _httpRequest = new HttpSimulator().SimulateRequest();
 
-                var controller = lts.Resolve<TController>();
-                _session = lts.Resolve<TSession>();
+                var controller = requestScope.Resolve<TController>();
+                _session = requestScope.Resolve<TSession>();
                 if (setup.SessionSetup != null)
                     setup.SessionSetup(_session);
 
