@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -87,11 +89,11 @@ namespace ControllerTests
             set { _session = value; }
         }
 
-        protected HttpResponseMessage Get(string relativeUrl)
-        { return SendMessage(HttpMethod.Get, relativeUrl); }
+        protected HttpResponseMessage Get(string relativeUrl, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Get, relativeUrl, null, additionalHeaders); }
 
-        protected HttpResponseMessage Post(string relativeUrl, object content)
-        { return SendMessage(HttpMethod.Post, relativeUrl, content); }
+        protected HttpResponseMessage Post(string relativeUrl, object content, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Post, relativeUrl, content, additionalHeaders); }
 
         public void Dispose()
         {
@@ -119,10 +121,14 @@ namespace ControllerTests
             _disposed = true;
         }
 
-        private HttpResponseMessage SendMessage(HttpMethod method, string relativeUrl, object content = null)
+        private HttpResponseMessage SendMessage(HttpMethod method, string relativeUrl, object content = null,
+            params Tuple<string, string>[] additionalHeaders)
         {
             var request = new HttpRequestMessage(method, new Uri(_baseUri, relativeUrl));
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
+            if (additionalHeaders.Any())
+                foreach (var header in additionalHeaders)
+                    request.Headers.Add(header.Item1, header.Item2.Split(','));
             if (content != null)
                 request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, MediaType);
 

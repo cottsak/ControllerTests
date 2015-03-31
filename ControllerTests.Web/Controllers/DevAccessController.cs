@@ -1,26 +1,33 @@
-﻿using System;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using ControllerTests.Web.Helpers;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 
 namespace ControllerTests.Web.Controllers
 {
     public class DevAccessController : ApiController
     {
-        private readonly IDevAccessChecker _decDevAccessChecker;
-
-        public DevAccessController(IDevAccessChecker decDevAccessChecker)
-        {
-            _decDevAccessChecker = decDevAccessChecker;
-        }
-
+        [DevAccessFilter]
         public HttpResponseMessage Get()
         {
-            if (_decDevAccessChecker.UserHasDevAccess())
-                return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+    }
 
-            return new HttpResponseMessage(HttpStatusCode.Forbidden);
+    class DevAccessFilter : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            if (actionContext.Request.Headers.Contains("dev") &&
+                actionContext.Request.Headers.GetValues("dev").Contains("1234"))
+            {
+                // all ok
+                base.OnActionExecuting(actionContext);
+            }
+            else
+                throw new HttpResponseException(HttpStatusCode.NotFound);
         }
     }
 }

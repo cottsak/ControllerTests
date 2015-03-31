@@ -1,9 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using ControllerTests.MigrateDb;
 using ControllerTests.Web;
-using ControllerTests.Web.Helpers;
 using NCrunch.Framework;
-using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
@@ -39,19 +38,17 @@ namespace ControllerTests.Tests
         #endregion
 
         [Test]
-        public void WhenDevAccessIsPresent_WhenGet_ThenResultIs200()
+        public void WhenDevAccessIsNotPresent_WhenGet_ThenResultIs404()
         {
-            SubstituteAndConfigure<IDevAccessChecker>().UserHasDevAccess().Returns(true);
-
-            Get("/api/devaccess").StatusCode.ShouldBe((HttpStatusCode)200);
+            Get("/api/devaccess").StatusCode.ShouldBe((HttpStatusCode)404);
         }
 
         [Test]
-        public void WhenDevAccessIsNotPresent_WhenGet_ThenResultIs403()
+        public void WhenISendTheCorrectDevAccessHeader_WhenGet_ThenResultIs200()
         {
-            SubstituteAndConfigure<IDevAccessChecker>().UserHasDevAccess().Returns(false);
+            var headers = Tuple.Create("dev", "1234");
 
-            Get("/api/devaccess").StatusCode.ShouldBe((HttpStatusCode)403);
+            Get("/api/devaccess", headers).StatusCode.ShouldBe((HttpStatusCode)200);
         }
     }
 }
