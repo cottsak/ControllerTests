@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Autofac;
 using Autofac.Core.Lifetime;
+using NSubstitute;
 using Subtext.TestLibrary;
 
 namespace ControllerTests
@@ -28,6 +31,7 @@ namespace ControllerTests
                 _httpRequest = new HttpSimulator().SimulateRequest();
 
                 var controller = requestScope.Resolve<TController>();
+                SetupRequestMocking(requestScope, controller);
                 _session = requestScope.Resolve<TSession>();
                 if (setup.SessionSetup != null)
                     setup.SessionSetup(_session);
@@ -73,6 +77,13 @@ namespace ControllerTests
                 _setup.PostControllerAction(Session);
 
             return result;
+        }
+
+        private static void SetupRequestMocking(ILifetimeScope requestScope, TController controller)
+        {
+            var context = Substitute.For<HttpContextBase>();
+            context.Request.Returns(requestScope.Resolve<HttpRequestBase>());
+            controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
         }
 
         public void Dispose()
