@@ -69,7 +69,13 @@ namespace ControllerTests
             set { _session = value; }
         }
 
-        protected ActionResult InvokeAction(Func<TController, ActionResult> action)
+        /// <summary>
+        /// This should be used for the 'Act' part of your test (in Arragne/Act/Assert terms). Please don't use this as a 
+        /// generic method to access the controller instance. make assertions using the Controller instance with -- instead
+        /// </summary>
+        /// <param name="action">a lambda which invokes the controller action under test. eg InvokeAction(c => c.ChangePassword(vm));</param>
+        /// <returns>the result of the Action being invoked</returns>
+        protected ActionResult ActAction(Func<TController, ActionResult> action)
         {
             var result = action(_controller.Value);
 

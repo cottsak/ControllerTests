@@ -49,7 +49,7 @@ namespace ControllerTests.Tests
             }.ForEach(ic => Session.Save(ic));
             Session.Flush();
 
-            var model = (IEnumerable<IntegratedCircuit>)((ViewResult)InvokeAction(c => c.Index())).Model;
+            var model = (IEnumerable<IntegratedCircuit>)((ViewResult)ActAction(c => c.Index())).Model;
 
             model.Count().ShouldBe(3);
             model.Last().Description.ShouldBe("Test3");
@@ -61,7 +61,7 @@ namespace ControllerTests.Tests
             const string newIcCode = "556";
             const string newIcDescription = "dual timer";
 
-            InvokeAction(c => c.CreateIC(newIcCode, newIcDescription));
+            ActAction(c => c.CreateIC(newIcCode, newIcDescription));
 
             var newIc = Session.Query<IntegratedCircuit>().Single();
             newIc.Code.ShouldBe(newIcCode);
@@ -82,7 +82,7 @@ namespace ControllerTests.Tests
             newICs.ForEach(ic => Session.Save(ic));
             Session.Flush();
 
-            InvokeAction(c => c.DeleteICs(newICs.Select(i => i.Id).ToArray()));
+            ActAction(c => c.DeleteICs(newICs.Select(i => i.Id).ToArray()));
 
             Session.Query<IntegratedCircuit>().Count().ShouldBe(0);
         }
