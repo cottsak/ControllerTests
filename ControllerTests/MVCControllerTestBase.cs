@@ -70,10 +70,11 @@ namespace ControllerTests
         }
 
         /// <summary>
-        /// This should be used for the 'Act' part of your test (in Arragne/Act/Assert terms). Please don't use this as a 
-        /// generic method to access the controller instance. make assertions using the Controller instance with -- instead
+        /// This should be used for the 'Act' part of your test (in Arrange/Act/Assert terms). Please don't use this as a 
+        /// generic method to access the controller instance. Make assertions using the Controller 
+        /// instance with <see cref="AssertWithController"/> instead
         /// </summary>
-        /// <param name="action">a lambda which invokes the controller action under test. eg InvokeAction(c => c.ChangePassword(vm));</param>
+        /// <param name="action">a lambda which invokes the controller action under test. eg ActAction(c => c.ChangePassword(vm));</param>
         /// <returns>the result of the Action being invoked</returns>
         protected ActionResult ActAction(Func<TController, ActionResult> action)
         {
@@ -84,6 +85,12 @@ namespace ControllerTests
 
             return result;
         }
+
+        /// <summary>
+        /// Use this optional helper to make assertions in your test that require the Controller instance.
+        /// </summary>
+        protected void AssertWithController(Action<TController> controllerAction)
+        { controllerAction(_controller.Value); }
 
         private static void SetupRequestMocking(ILifetimeScope requestScope, TController controller)
         {
