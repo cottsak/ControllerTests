@@ -44,7 +44,7 @@ namespace ControllerTests
         protected void ConfigureServices(Action<ContainerBuilder> config)
         {
             if (_controller.IsValueCreated)
-                throw new InvalidOperationException("Can not configure after the server has been initialised. Always ConfigureServices before using the Session member.");
+                throw Constants.BadBuilderConfigOrderException();
 
             _setup.AdditionalConfig += config;
         }

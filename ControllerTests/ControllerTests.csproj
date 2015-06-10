@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiControllerTestBase.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="MVCControllerTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
