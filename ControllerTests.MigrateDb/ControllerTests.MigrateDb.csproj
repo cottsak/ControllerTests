@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="scripts\20150612-1AddFlagTable.sql" />
     <EmbeddedResource Include="scripts\20141205-1AddIntegratedCircuitTable.sql" />
   </ItemGroup>
   <ItemGroup>

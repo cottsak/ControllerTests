@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
+using ControllerTests.Web.Controllers;
 using ControllerTests.Web.Helpers;
 using NHibernate;
 
@@ -36,6 +37,7 @@ namespace ControllerTests.Web
             RegisterDatabaseComponents(builder);
 
             builder.RegisterType<DevAccessChecker>().AsImplementedInterfaces().InstancePerLifetimeScope();
+            builder.RegisterType<BackgroundService>().AsImplementedInterfaces().InstancePerLifetimeScope();
         }
 
         private void RegisterDatabaseComponents(ContainerBuilder builder)

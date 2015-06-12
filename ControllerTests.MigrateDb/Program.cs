@@ -26,7 +26,13 @@ namespace ControllerTests.MigrateDb
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(result.Error);
                 Console.ResetColor();
+
+#if DEBUG
+                Console.ReadLine();
+#endif
+
                 return -1;
+
             }
 
             Console.ForegroundColor = ConsoleColor.Green;

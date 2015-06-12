@@ -1,17 +1,17 @@
 ﻿@using ControllerTests.Web.Helpers
-@model IEnumerable<ControllerTests.Web.Models.IntegratedCircuit>
+@model ControllerTests.Web.Controllers.HomeController.IndexVM
 
 <h1>here are some common ICs</h1>
 
 @Html.RenderPageAlert()
 
-@if (!Model.Any())
+@if (!Model.ICs.Any())
 {
     <div>There are no items to show.</div>
 }
 
 <ul>
-    @foreach (var ic in Model)
+    @foreach (var ic in Model.ICs)
     {
         <li>
             @ic.Code - @ic.Description
@@ -43,7 +43,9 @@
     </div>
 </div>
 
-<p>@Html.ActionLink("Delete multiple ICs at once..", "DeleteICs", null, new { @class = "text-danger" })</p>
+<p>@Html.ActionLink("Delete multiple ICs at once..", "DeleteICs", null, new {@class = "text-danger"})</p>
+
+<p>Last time BG process started: @(Model.LastBGTaskRunTimeUTC.HasValue ? Model.LastBGTaskRunTimeUTC.Value.ToString("o") : "not run yet!")</p>
 
 <script type="text/javascript">
     function ajaxDeleteAndRemove(url, confirmMessage, selectorToRemove) {

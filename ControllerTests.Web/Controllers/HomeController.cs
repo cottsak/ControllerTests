@@ -12,17 +12,25 @@ namespace ControllerTests.Web.Controllers
     {
         private readonly ISession _session;
         private readonly IDevAccessChecker _devAccessChecker;
+        private readonly IBackgroundService _backgroundService;
 
-        public HomeController(ISession session, IDevAccessChecker devAccessChecker)
+        public HomeController(ISession session, IDevAccessChecker devAccessChecker, IBackgroundService backgroundService)
         {
             _session = session;
             _devAccessChecker = devAccessChecker;
+            _backgroundService = backgroundService;
         }
 
         public ActionResult Index()
         {
-            var ics = _session.Query<IntegratedCircuit>().ToList();
-            return View(ics);
+            var ics = _session.Query<IntegratedCircuit>().ToArray();
+            return View(new IndexVM { ICs = ics, LastBGTaskRunTimeUTC = _backgroundService.GetLastRunInUtc() });
+        }
+
+        public class IndexVM
+        {
+            public IntegratedCircuit[] ICs { get; set; }
+            public DateTime? LastBGTaskRunTimeUTC { get; set; }
         }
 
         [HttpPost]

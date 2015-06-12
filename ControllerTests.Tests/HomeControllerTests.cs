@@ -49,7 +49,7 @@ namespace ControllerTests.Tests
             }.ForEach(ic => Session.Save(ic));
             Session.Flush();
 
-            var model = (IEnumerable<IntegratedCircuit>)((ViewResult)ActAction(c => c.Index())).Model;
+            var model = ((HomeController.IndexVM)((ViewResult)ActAction(c => c.Index())).Model).ICs;
 
             model.Count().ShouldBe(3);
             model.Last().Description.ShouldBe("Test3");
