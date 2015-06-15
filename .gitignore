@@ -7,3 +7,4 @@
 /*.ncrunchsolution
 *_NCrunch*
 /scripts/run.cmd
+/.vs/config/applicationhost.config
