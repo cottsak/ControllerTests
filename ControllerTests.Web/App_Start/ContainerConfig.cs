@@ -18,11 +18,12 @@ namespace ControllerTests.Web
             return builder.Build();
         }
 
-        internal static void SetupDependencyInjection()
+        internal static IContainer SetupDependencyInjection()
         {
             var container = BuildContainer();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            return container;
         }
     }
 
@@ -44,7 +45,7 @@ namespace ControllerTests.Web
         {
             builder.Register(context => NhibernateConfig.CreateSessionFactory().OpenSession())
                 .As<ISession>()
-                .InstancePerRequest()
+                .InstancePerLifetimeScope()
                 .OnRelease(session =>
                     {
                         NhibernateConfig.CompleteRequest(session);

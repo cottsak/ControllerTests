@@ -39,8 +39,10 @@ namespace ControllerTests.Web.Controllers
             // record the start time
             var flag = _session.Get<BgServiceFlag>(BgServiceFlag.LookupId);
             flag.LastStarted = DateTime.UtcNow;
+            _session.Flush();
 
             // noop
+            System.Threading.Thread.Sleep(20000);
         }
     }
 
