@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -37,7 +38,7 @@ namespace ControllerTests
                     setup.SessionSetup(_session);
 
                 return controller;
-            });
+            }, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         protected void ConfigureServices(Action<ContainerBuilder> config)
