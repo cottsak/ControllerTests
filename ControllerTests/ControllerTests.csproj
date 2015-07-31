@@ -98,6 +98,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnyControllerTestBase.cs" />
     <Compile Include="ApiControllerTestBase.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="MVCControllerTestBase.cs" />

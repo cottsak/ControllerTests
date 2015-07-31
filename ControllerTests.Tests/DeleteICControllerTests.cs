@@ -4,7 +4,6 @@ using Autofac;
 using ControllerTests.MigrateDb;
 using ControllerTests.Web;
 using ControllerTests.Web.Models;
-using NCrunch.Framework;
 using NHibernate;
 using NHibernate.Linq;
 using Shouldly;
@@ -12,7 +11,6 @@ using Xunit;
 
 namespace ControllerTests.Tests
 {
-    [ExclusivelyUses(HomeControllerTests.SingleThreadForDb)]
     public class DeleteIcControllerTests : ApiControllerTestBase<ISession>
     {
         static DeleteIcControllerTests()

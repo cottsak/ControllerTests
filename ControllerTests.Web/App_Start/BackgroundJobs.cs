@@ -17,7 +17,7 @@ namespace ControllerTests.Web
 
 
             // start jobs
-            RecurringJob.AddOrUpdate<IBackgroundService>(service => service.InvokeRun(), Cron.Minutely);
+            RecurringJob.AddOrUpdate<IBackgroundService>(service => service.InvokeRun(), "0/2 * * * *");
         }
     }
 }

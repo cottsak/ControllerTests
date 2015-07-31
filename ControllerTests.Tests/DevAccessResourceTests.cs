@@ -2,13 +2,11 @@
 using System.Net;
 using ControllerTests.MigrateDb;
 using ControllerTests.Web;
-using NCrunch.Framework;
 using NUnit.Framework;
 using Shouldly;
 
 namespace ControllerTests.Tests
 {
-    [ExclusivelyUses(HomeControllerTests.SingleThreadForDb)]
     public class DevAccessResourceTests : ApiControllerTestBase
     {
         static DevAccessResourceTests()

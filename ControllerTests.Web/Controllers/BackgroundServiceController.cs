@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using FluentNHibernate.Mapping;
 using NHibernate;
 
@@ -38,11 +39,12 @@ namespace ControllerTests.Web.Controllers
         {
             // record the start time
             var flag = _session.Get<BgServiceFlag>(BgServiceFlag.LookupId);
+            flag = flag ?? CreateRecord();
             flag.LastStarted = DateTime.UtcNow;
             _session.Flush();
 
-            // noop
-            System.Threading.Thread.Sleep(20000);
+            // fake out some real work
+            Thread.Sleep(2000);
         }
     }
 
