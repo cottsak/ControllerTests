@@ -1,6 +1,7 @@
 using System;
 using Autofac;
 using Autofac.Core.Lifetime;
+using NSubstitute;
 
 namespace ControllerTests
 {
@@ -30,6 +31,21 @@ namespace ControllerTests
 
                 return controller;
             });
+        }
+
+        protected void ConfigureServices(Action<ContainerBuilder> config)
+        {
+            if (_controller.IsValueCreated)
+                throw Constants.BadBuilderConfigOrderException();
+
+            _setup.AdditionalConfig += config;
+        }
+
+        protected T SubstituteAndConfigure<T>() where T : class
+        {
+            var sub = Substitute.For<T>();
+            ConfigureServices(builder => builder.Register(context => sub).As<T>());
+            return sub;
         }
 
         protected TSession Session
