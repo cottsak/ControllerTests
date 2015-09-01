@@ -16,9 +16,9 @@ namespace ControllerTests
         private HttpSimulator _httpRequest;
         private readonly Lazy<TController> _controller;
         private TSession _session;
-        private readonly MvcTestSetup<TSession> _setup;
+        private readonly TestSetup<TSession> _setup;
 
-        protected MvcControllerTestBase(MvcTestSetup<TSession> setup)
+        protected MvcControllerTestBase(TestSetup<TSession> setup)
         {
             if (setup == null)
                 throw new ArgumentException("Please initialise the test class by creating a constructor and passing the setup argument to base()", "setup");
@@ -51,7 +51,7 @@ namespace ControllerTests
 
         protected T SubstituteAndConfigure<T>() where T : class
         {
-            var sub = NSubstitute.Substitute.For<T>();
+            var sub = Substitute.For<T>();
             ConfigureServices(builder => builder.Register(context => sub).As<T>());
             return sub;
         }
@@ -125,30 +125,5 @@ namespace ControllerTests
 
             _disposed = true;
         }
-    }
-
-    public class MvcTestSetup<TSession>
-    {
-        public MvcTestSetup(IContainer container,
-            Action<ContainerBuilder> additionalConfig = null,
-            Action<TSession> sessionSetup = null,
-            Action<TSession> sessionTeardown = null,
-            Action<TSession> postControllerAction = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException("container", "A real container must be supplied to setup tests");
-            Container = container;
-
-            AdditionalConfig = additionalConfig ?? (builder => { });
-            SessionSetup = sessionSetup;
-            SessionTeardown = sessionTeardown;
-            PostControllerAction = postControllerAction;
-        }
-
-        internal IContainer Container { get; private set; }
-        internal Action<ContainerBuilder> AdditionalConfig { get; set; }
-        internal Action<TSession> SessionSetup { get; private set; }
-        internal Action<TSession> SessionTeardown { get; private set; }
-        internal Action<TSession> PostControllerAction { get; private set; }
     }
 }

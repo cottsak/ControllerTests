@@ -9,9 +9,9 @@ namespace ControllerTests
         private bool _disposed;
         private readonly Lazy<TController> _controller;
         private TSession _session;
-        private readonly AnyTestSetup<TSession> _setup;
+        private readonly TestSetup<TSession> _setup;
 
-        protected AnyControllerTestBase(AnyTestSetup<TSession> setup)
+        protected AnyControllerTestBase(TestSetup<TSession> setup)
         {
             if (setup == null)
                 throw new ArgumentException("Please initialise the test class by creating a constructor and passing the setup argument to base()", "setup");
@@ -80,10 +80,9 @@ namespace ControllerTests
         }
     }
 
-    public class AnyTestSetup<TSession>
+    public class TestSetup<TSession>
     {
-        // todo: merge with MvcTestSetup?
-        public AnyTestSetup(IContainer container,
+        public TestSetup(IContainer container,
             Action<ContainerBuilder> additionalConfig = null,
             Action<TSession> sessionSetup = null,
             Action<TSession> sessionTeardown = null,

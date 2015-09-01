@@ -16,7 +16,7 @@ namespace ControllerTests.Tests
         }
 
         public BgServiceTests()
-            : base(new AnyTestSetup<ISession>(
+            : base(new TestSetup<ISession>(
                 ContainerConfig.BuildContainer(),
                 sessionSetup: session => session.BeginTransaction(),
                 sessionTeardown: session => session.Transaction.Dispose(), // tear down transaction to release locks
