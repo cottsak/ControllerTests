@@ -21,7 +21,7 @@ namespace ControllerTests.Tests
         }
 
         public HomeControllerTests()
-            : base(new MvcTestSetup<ISession>(
+            : base(new TestSetup<ISession>(
                 ContainerConfig.BuildContainer(),
                 sessionSetup: session => session.BeginTransaction(),
                 sessionTeardown: session => session.Transaction.Dispose(), // tear down transaction to release locks
