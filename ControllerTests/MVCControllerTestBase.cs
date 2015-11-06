@@ -81,8 +81,8 @@ namespace ControllerTests
         {
             var result = action(_controller.Value);
 
-            if (_setup.PostControllerAction != null)
-                _setup.PostControllerAction(Session);
+            if (_setup.AfterActAction != null)
+                _setup.AfterActAction(Session);
 
             return result;
         }
