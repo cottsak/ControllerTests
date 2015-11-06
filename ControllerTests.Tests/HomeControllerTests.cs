@@ -25,7 +25,7 @@ namespace ControllerTests.Tests
                 ContainerConfig.BuildContainer(),
                 sessionSetup: session => session.BeginTransaction(),
                 sessionTeardown: session => session.Transaction.Dispose(), // tear down transaction to release locks
-                postControllerAction: session =>
+                afterActAction: session =>
                 {
                     NhibernateConfig.CompleteRequest(session);
                     session.Clear(); // this is to ensure we don't get ghost results from the NHibernate cache

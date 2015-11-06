@@ -5,10 +5,16 @@ using NSubstitute;
 
 namespace ControllerTests
 {
-    public abstract class AnyControllerTestBase<TController, TSession> : IDisposable
+    /// <summary>
+    /// This base type allows you to write simple tests which encapsulate the whole lifecycle of the 
+    /// System Under Test (SUT/TSystem)
+    /// </summary>
+    /// <typeparam name="TSystem">The System Under Test (SUT): a controller, service or other contract that will be used as an entry point.</typeparam>
+    /// <typeparam name="TSession">The contract which allows you to set up and assert state changes. eg. database connection, ORM session abstraction.</typeparam>
+    public abstract class AnyControllerTestBase<TSystem, TSession> : IDisposable
     {
         private bool _disposed;
-        private readonly Lazy<TController> _controller;
+        private readonly Lazy<TSystem> _system;
         private TSession _session;
         private readonly TestSetup<TSession> _setup;
 
@@ -18,24 +24,24 @@ namespace ControllerTests
                 throw new ArgumentException("Please initialise the test class by creating a constructor and passing the setup argument to base()", "setup");
             _setup = setup;
 
-            _controller = new Lazy<TController>(() =>
+            _system = new Lazy<TSystem>(() =>
             {
                 var container = setup.Container;
                 // todo: remove MatchingScopeLifetimeTags.RequestLifetimeScopeTag? we don't know what framework will create a LTS and how it will do it
                 var rootScope = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag, setup.AdditionalConfig);
 
-                var controller = rootScope.Resolve<TController>();
+                var system = rootScope.Resolve<TSystem>();
                 _session = rootScope.Resolve<TSession>();
                 if (setup.SessionSetup != null)
                     setup.SessionSetup(_session);
 
-                return controller;
+                return system;
             });
         }
 
         protected void ConfigureServices(Action<ContainerBuilder> config)
         {
-            if (_controller.IsValueCreated)
+            if (_system.IsValueCreated)
                 throw Constants.BadBuilderConfigOrderException();
 
             _setup.AdditionalConfig += config;
@@ -52,9 +58,9 @@ namespace ControllerTests
         {
             get
             {
-                if (!_controller.IsValueCreated)
+                if (!_system.IsValueCreated)
                 {
-                    var initController = _controller.Value;
+                    var initSystem = _system.Value;
                 }
 
                 return _session;
@@ -62,12 +68,22 @@ namespace ControllerTests
             set { _session = value; }
         }
 
-        protected void ActAction(Action<TController> action)
+        protected void ActAction(Action<TSystem> action)
         {
-            action(_controller.Value);
+            action(_system.Value);
 
-            if (_setup.PostControllerAction != null)
-                _setup.PostControllerAction(Session);
+            if (_setup.AfterActAction != null)
+                _setup.AfterActAction(Session);
+        }
+
+        protected TResult ActAction<TResult>(Func<TSystem, TResult> action)
+        {
+            var result = action(_system.Value);
+
+            if (_setup.AfterActAction != null)
+                _setup.AfterActAction(Session);
+
+            return result;
         }
 
         public void Dispose()
@@ -102,7 +118,7 @@ namespace ControllerTests
             Action<ContainerBuilder> additionalConfig = null,
             Action<TSession> sessionSetup = null,
             Action<TSession> sessionTeardown = null,
-            Action<TSession> postControllerAction = null)
+            Action<TSession> afterActAction = null)
         {
             if (container == null)
                 throw new ArgumentNullException("container", "A real container must be supplied to setup tests");
@@ -111,13 +127,13 @@ namespace ControllerTests
             AdditionalConfig = additionalConfig ?? (builder => { });
             SessionSetup = sessionSetup;
             SessionTeardown = sessionTeardown;
-            PostControllerAction = postControllerAction;
+            AfterActAction = afterActAction;
         }
 
         internal IContainer Container { get; private set; }
         internal Action<ContainerBuilder> AdditionalConfig { get; set; }
         internal Action<TSession> SessionSetup { get; private set; }
         internal Action<TSession> SessionTeardown { get; private set; }
-        internal Action<TSession> PostControllerAction { get; private set; }
+        internal Action<TSession> AfterActAction { get; private set; }
     }
 }
