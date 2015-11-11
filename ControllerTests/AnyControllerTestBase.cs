@@ -106,6 +106,9 @@ namespace ControllerTests
             {
                 if (_setup.SessionTeardown != null)
                     _setup.SessionTeardown(Session);
+
+                if (_system.Value is IDisposable)
+                    (_system.Value as IDisposable).Dispose();
             }
 
             _disposed = true;
