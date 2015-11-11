@@ -27,8 +27,7 @@ namespace ControllerTests
             _system = new Lazy<TSystem>(() =>
             {
                 var container = setup.Container;
-                // todo: remove MatchingScopeLifetimeTags.RequestLifetimeScopeTag? we don't know what framework will create a LTS and how it will do it
-                var rootScope = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag, setup.AdditionalConfig);
+                var rootScope = container.BeginLifetimeScope(setup.AdditionalConfig);
 
                 var system = rootScope.Resolve<TSystem>();
                 _session = rootScope.Resolve<TSession>();
