@@ -95,6 +95,12 @@ namespace ControllerTests
         protected HttpResponseMessage Post(string relativeUrl, object content, params Tuple<string, string>[] additionalHeaders)
         { return SendMessage(HttpMethod.Post, relativeUrl, content, additionalHeaders); }
 
+        protected HttpResponseMessage Put(string relativeUrl, object content, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Put, relativeUrl, content, additionalHeaders); }
+
+        protected HttpResponseMessage Delete(string relativeUrl, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Delete, relativeUrl, null, additionalHeaders); }
+
         public void Dispose()
         {
             Dispose(true);
