@@ -19,7 +19,10 @@ namespace ControllerTests.Tests
             var typesToTest = typeof(ContainerConfig).Assembly.GetTypes()
                 .Where(t => _controllerTypes.Any(tt => tt.IsAssignableFrom(t)));
 
+            // this call uses the app.config connection string and the store.mdf in this repo
+            // all other tests should use the LocalDb.cs helper.
             var container = ContainerConfig.BuildContainer();
+            
             using (var requestScope = container.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag))
                 foreach (var type in typesToTest)
                     requestScope.Resolve(type);

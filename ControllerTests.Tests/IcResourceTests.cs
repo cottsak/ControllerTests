@@ -15,20 +15,19 @@ namespace ControllerTests.Tests
 {
     public class IcResourceTests : ApiControllerTestBase<ISession>
     {
-        static IcResourceTests()
-        {
-            Program.Main(new[] { Config.DatabaseConnectionString });
-        }
-
         public IcResourceTests()
             : base(new ApiTestSetup<ISession>(
                 ContainerConfig.BuildContainer(),
                 WebApiConfig.Register,
                 builder =>
                 {
+                    var conn = new LocalDb().OpenConnection();
+                    // migrate empty db
+                    Program.Main(new[] { conn.ConnectionString });
+
                     // changing the ISession to a singleton so that the two ISession Resolve() calls
                     // produce the same instance such that the transaction includes all test activity.
-                    builder.Register(context => NhibernateConfig.CreateSessionFactory().OpenSession())
+                    builder.Register(context => NhibernateConfig.CreateSessionFactory(conn.ConnectionString).OpenSession())
                         .As<ISession>()
                         .SingleInstance();
                 },

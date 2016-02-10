@@ -8,12 +8,12 @@ namespace ControllerTests.Web
 {
     class NhibernateConfig
     {
-        internal static ISessionFactory CreateSessionFactory()
+        internal static ISessionFactory CreateSessionFactory(string connectionString = null)
         {
             return Fluently
                 .Configure()
                 .Database(() =>
-                    MsSqlConfiguration.MsSql2012.ConnectionString(Config.DatabaseConnectionString))
+                    MsSqlConfiguration.MsSql2012.ConnectionString(connectionString ?? Config.DatabaseConnectionString))
                 .Mappings(mc => mc.FluentMappings.AddFromAssemblyOf<IntegratedCircuit>())
                 .BuildSessionFactory();
         }
