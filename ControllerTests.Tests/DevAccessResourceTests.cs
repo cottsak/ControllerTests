@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using ControllerTests.MigrateDb;
 using ControllerTests.Web;
 using NUnit.Framework;
 using Shouldly;
@@ -9,11 +8,6 @@ namespace ControllerTests.Tests
 {
     public class DevAccessResourceTests : ApiControllerTestBase
     {
-        static DevAccessResourceTests()
-        {
-            Program.Main(new[] { Config.DatabaseConnectionString });
-        }
-
         #region NUnit overhead
 
         private static readonly ApiTestSetup<NoSession> DevAccessResourceTestsSetup =

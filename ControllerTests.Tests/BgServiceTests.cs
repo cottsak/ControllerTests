@@ -1,6 +1,4 @@
 ﻿using System;
-using ControllerTests.MigrateDb;
-using ControllerTests.Web;
 using ControllerTests.Web.Controllers;
 using NHibernate;
 using Shouldly;
@@ -10,23 +8,7 @@ namespace ControllerTests.Tests
 {
     public class BgServiceTests : AnyControllerTestBase<IBackgroundService, ISession>
     {
-        static BgServiceTests()
-        {
-            Program.Main(new[] { Config.DatabaseConnectionString });
-        }
-
-        public BgServiceTests()
-            : base(new TestSetup<ISession>(
-                ContainerConfig.BuildContainer(),
-                sessionSetup: session => session.BeginTransaction(),
-                sessionTeardown: session => session.Transaction.Dispose(), // tear down transaction to release locks
-                afterActAction: session =>
-                {
-                    NhibernateConfig.CompleteRequest(session);
-                    session.Clear(); // this is to ensure we don't get ghost results from the NHibernate cache
-                }
-                ))
-        { }
+        public BgServiceTests() : base(HomeControllerTests.MssqlTestSetup) { }
 
         [Fact]
         public void WhenInvokeRun_ThenDateFlagShouldBeWithin5sOfUtcNow()

@@ -15,8 +15,3 @@ TODO: confidence, ROI, etc
 # Examples
 
 TODO
-
-# Readme todos
-
-* explain that NCrunch `[ExclusivelyUses("db-transaction")]` may be required for MSSQL and similar 'transaction isolation' implementations (this problem might just be about running tests in parallel actually)
-

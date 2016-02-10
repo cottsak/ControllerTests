@@ -141,6 +141,7 @@
     <Compile Include="DevAccessResourceTests.cs" />
     <Compile Include="HomeControllerTests.cs" />
     <Compile Include="IcResourceTests.cs" />
+    <Compile Include="LocalDb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
