@@ -16,29 +16,29 @@ namespace ControllerTests.Tests
 {
     public class HomeControllerTests : MvcControllerTestBase<HomeController, ISession>
     {
-        public HomeControllerTests()
-            : base(new TestSetup<ISession>(
-                ContainerConfig.BuildContainer(),
-                builder =>
-                {
-                    var conn = new LocalDb().OpenConnection();
-                    // migrate empty db
-                    Program.Main(new[] { conn.ConnectionString });
+        internal static TestSetup<ISession> MssqlTestSetup = new TestSetup<ISession>(
+            ContainerConfig.BuildContainer(),
+            builder =>
+            {
+                var conn = new LocalDb().OpenConnection();
+                // migrate empty db
+                Program.Main(new[] { conn.ConnectionString });
 
-                    // changing the ISession to a singleton so that the two ISession Resolve() calls
-                    // produce the same instance such that the transaction includes all test activity.
-                    builder.Register(context => NhibernateConfig.CreateSessionFactory(conn.ConnectionString).OpenSession())
-                        .As<ISession>()
-                        .SingleInstance();
-                },
-                session => session.BeginTransaction(),
-                session => session.Transaction.Dispose(), // tear down transaction to release locks
-                session =>
-                {
-                    NhibernateConfig.CompleteRequest(session);
-                    session.Clear(); // this is to ensure we don't get ghost results from the NHibernate cache
-                }))
-        { }
+                // changing the ISession to a singleton so that the two ISession Resolve() calls
+                // produce the same instance such that the transaction includes all test activity.
+                builder.Register(context => NhibernateConfig.CreateSessionFactory(conn.ConnectionString).OpenSession())
+                    .As<ISession>()
+                    .SingleInstance();
+            },
+            session => session.BeginTransaction(),
+            session => session.Transaction.Dispose(), // tear down transaction to release locks
+            session =>
+            {
+                NhibernateConfig.CompleteRequest(session);
+                session.Clear(); // this is to ensure we don't get ghost results from the NHibernate cache
+            });
+
+        public HomeControllerTests() : base(MssqlTestSetup) { }
 
         [Fact]
         public void Given3ICs_WhenGetIndex_ThenAll3ICsAreReturned()

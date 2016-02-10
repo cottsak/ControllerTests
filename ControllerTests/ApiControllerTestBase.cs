@@ -177,6 +177,14 @@ namespace ControllerTests
             PostControllerAction = postControllerAction;
         }
 
+        public ApiTestSetup(TestSetup<TSession> setup, Action<HttpConfiguration> registerWebApiConfig)
+            : base(setup.Container, registerWebApiConfig, setup.AdditionalConfig)
+        {
+            SessionSetup = setup.SessionSetup;
+            SessionTeardown = setup.SessionTeardown;
+            PostControllerAction = setup.AfterActAction;
+        }
+
         internal ApiTestSetup(ApiTestSetup setup)
             : base(setup.Container, setup.RegisterWebApiConfig, setup.AdditionalConfig)
         { }

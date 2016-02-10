@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using System.Net;
-using Autofac;
-using ControllerTests.MigrateDb;
 using ControllerTests.Web;
 using ControllerTests.Web.Models;
 using NHibernate;
@@ -13,30 +11,7 @@ namespace ControllerTests.Tests
 {
     public class DeleteIcControllerTests : ApiControllerTestBase<ISession>
     {
-        public DeleteIcControllerTests()
-            : base(new ApiTestSetup<ISession>(
-                ContainerConfig.BuildContainer(),
-                WebApiConfig.Register,
-                builder =>
-                {
-                    var conn = new LocalDb().OpenConnection();
-                    // migrate empty db
-                    Program.Main(new[] { conn.ConnectionString });
-
-                    // changing the ISession to a singleton so that the two ISession Resolve() calls
-                    // produce the same instance such that the transaction includes all test activity.
-                    builder.Register(context => NhibernateConfig.CreateSessionFactory(conn.ConnectionString).OpenSession())
-                        .As<ISession>()
-                        .SingleInstance();
-                },
-                session => session.BeginTransaction(),
-                session => session.Transaction.Dispose(), // tear down transaction to release locks
-                session =>
-                {
-                    NhibernateConfig.CompleteRequest(session);
-                    session.Clear(); // this is to ensure we don't get ghost results from the NHibernate cache
-                }))
-        { }
+        public DeleteIcControllerTests() : base(new ApiTestSetup<ISession>(HomeControllerTests.MssqlTestSetup, WebApiConfig.Register)) { }
 
         [Fact]
         public void GivenOneIC_WhenRemoveOnlyIC_ThenStoreShouldBeEmpty()
