@@ -12,6 +12,7 @@ namespace ControllerTests.Tests
         // with thanks https://github.com/khalidabuhakmeh/DatabaseHelpersExample
 
         public static string DatabaseDirectory = "Data";
+        public static string LocalDbConnection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True";
 
         public string ConnectionStringName { get; private set; }
         public string DatabaseName { get; private set; }
@@ -34,8 +35,7 @@ namespace ControllerTests.Tests
 
         private void CreateDatabase()
         {
-            OutputFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                DatabaseDirectory);
+            OutputFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), DatabaseDirectory);
             var mdfFilename = string.Format("{0}.mdf", DatabaseName);
             DatabaseMdfPath = Path.Combine(OutputFolder, mdfFilename);
             DatabaseLogPath = Path.Combine(OutputFolder, String.Format("{0}_log.ldf", DatabaseName));
@@ -47,44 +47,30 @@ namespace ControllerTests.Tests
             }
 
             // If the database does not already exist, create it.
-            var connectionString = String.Format(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True");
-            using (var connection = new SqlConnection(connectionString))
+            using (var connection = new SqlConnection(LocalDbConnection))
             {
                 connection.Open();
                 var cmd = connection.CreateCommand();
-                DetachDatabase();
-                cmd.CommandText = string.Format("CREATE DATABASE {0} ON (NAME = N'{0}', FILENAME = '{1}')", DatabaseName,
-                    DatabaseMdfPath);
+                cmd.CommandText = String.Format("CREATE DATABASE {0} ON (NAME = N'{0}', FILENAME = '{1}')", DatabaseName, DatabaseMdfPath);
                 cmd.ExecuteNonQuery();
             }
 
             // Open newly created, or old database.
-            ConnectionStringName = string.Format(@"Data Source=(localdb)\MSSQLLocalDB;AttachDBFileName={1};Initial Catalog={0};Integrated Security=True;",
-                    DatabaseName, DatabaseMdfPath);
+            // todo: use the template LocalDbConnection so this doesn't get screwed when someone changes one but not the other
+            ConnectionStringName = String.Format(@"Data Source=(localdb)\MSSQLLocalDB;AttachDBFileName={1};Initial Catalog={0};Integrated Security=True;", DatabaseName, DatabaseMdfPath);
         }
 
-        private void DetachDatabase()
+        void DetachDatabase()
         {
-            try
+            using (var connection = new SqlConnection(LocalDbConnection))
             {
-                var connectionString = string.Format(@"Data Source=(LocalDB)\v11.0;Initial Catalog=master;Integrated Security=True");
-                using (var connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    var cmd = connection.CreateCommand();
-                    cmd.CommandText = string.Format("ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE; exec sp_detach_db '{0}'",
-                            DatabaseName);
-                    cmd.ExecuteNonQuery();
-                }
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = string.Format("ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE; exec sp_detach_db '{0}'", DatabaseName);
+                cmd.ExecuteNonQuery();
             }
-            catch
-            {
-            }
-            finally
-            {
-                if (File.Exists(DatabaseMdfPath)) File.Delete(DatabaseMdfPath);
-                if (File.Exists(DatabaseLogPath)) File.Delete(DatabaseLogPath);
-            }
+            if (File.Exists(DatabaseMdfPath)) File.Delete(DatabaseMdfPath);
+            if (File.Exists(DatabaseLogPath)) File.Delete(DatabaseLogPath);
         }
 
         // todo: use proper IDisposable impl
