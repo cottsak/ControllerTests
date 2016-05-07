@@ -1,5 +1,4 @@
 ﻿using System.Web.Http;
-using System.Web.Mvc;
 using System.Web.Routing;
 using ControllerTests.Web;
 using Microsoft.Owin;
@@ -15,7 +14,6 @@ namespace ControllerTests.Web
         {
             var container = ContainerConfig.SetupDependencyInjection();
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BackgroundJobs.Configure(app, container);
         }
