@@ -26,7 +26,6 @@ namespace ControllerTests
         private bool _disposed;
         private Lazy<HttpServer> _httpServer;
         private const string MediaType = "application/json";
-        private readonly Uri _baseUri = new Uri("http://localhost");
         private TSession _session;
         private ApiTestSetup<TSession> _setup;
 
@@ -89,17 +88,17 @@ namespace ControllerTests
             set { _session = value; }
         }
 
-        protected HttpResponseMessage Get(string relativeUrl, params Tuple<string, string>[] additionalHeaders)
-        { return SendMessage(HttpMethod.Get, relativeUrl, null, additionalHeaders); }
+        protected HttpResponseMessage Get(string relativeUrl, bool useHttps = false, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Get, relativeUrl, null, useHttps, additionalHeaders); }
 
-        protected HttpResponseMessage Post(string relativeUrl, object content, params Tuple<string, string>[] additionalHeaders)
-        { return SendMessage(HttpMethod.Post, relativeUrl, content, additionalHeaders); }
+        protected HttpResponseMessage Post(string relativeUrl, object content, bool useHttps = false, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Post, relativeUrl, content, useHttps, additionalHeaders); }
 
-        protected HttpResponseMessage Put(string relativeUrl, object content, params Tuple<string, string>[] additionalHeaders)
-        { return SendMessage(HttpMethod.Put, relativeUrl, content, additionalHeaders); }
+        protected HttpResponseMessage Put(string relativeUrl, object content, bool useHttps = false, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Put, relativeUrl, content, useHttps, additionalHeaders); }
 
-        protected HttpResponseMessage Delete(string relativeUrl, params Tuple<string, string>[] additionalHeaders)
-        { return SendMessage(HttpMethod.Delete, relativeUrl, null, additionalHeaders); }
+        protected HttpResponseMessage Delete(string relativeUrl, bool useHttps = false, params Tuple<string, string>[] additionalHeaders)
+        { return SendMessage(HttpMethod.Delete, relativeUrl, null, useHttps, additionalHeaders); }
 
         public void Dispose()
         {
@@ -127,10 +126,10 @@ namespace ControllerTests
             _disposed = true;
         }
 
-        private HttpResponseMessage SendMessage(HttpMethod method, string relativeUrl, object content = null,
+        private HttpResponseMessage SendMessage(HttpMethod method, string relativeUrl, object content = null, bool useHttps = false,
             params Tuple<string, string>[] additionalHeaders)
         {
-            var request = new HttpRequestMessage(method, new Uri(_baseUri, relativeUrl));
+            var request = new HttpRequestMessage(method, new Uri(useHttps ? new Uri("https://localhost") : new Uri("http://localhost"), relativeUrl));
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
             if (additionalHeaders.Any())
                 foreach (var header in additionalHeaders)

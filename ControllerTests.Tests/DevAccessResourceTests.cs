@@ -40,7 +40,7 @@ namespace ControllerTests.Tests
         {
             var headers = Tuple.Create("dev", "1234");
 
-            Get("/api/devaccess", headers).StatusCode.ShouldBe((HttpStatusCode)200);
+            Get("/api/devaccess", additionalHeaders: headers).StatusCode.ShouldBe((HttpStatusCode)200);
         }
     }
 }

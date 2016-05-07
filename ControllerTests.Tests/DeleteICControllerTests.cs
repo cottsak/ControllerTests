@@ -20,7 +20,7 @@ namespace ControllerTests.Tests
             Session.Save(ic);
             Session.Flush();
 
-            var result = Post("/api/deleteic/" + ic.Id, new { });
+            var result = Post("/api/deleteic/" + ic.Id, new { }, useHttps: true);
 
             result.StatusCode.ShouldBe(HttpStatusCode.OK);
             Session.Query<IntegratedCircuit>().ShouldBeEmpty();
@@ -38,7 +38,7 @@ namespace ControllerTests.Tests
             Session.Flush();
             var ic2 = Session.Query<IntegratedCircuit>().Single(i => i.Code == "2");
 
-            var result = Post("/api/deleteic/" + ic2.Id, new { });
+            var result = Post("/api/deleteic/" + ic2.Id, new { }, useHttps: true);
 
             result.StatusCode.ShouldBe(HttpStatusCode.OK);
             var allRemainingICs = Session.Query<IntegratedCircuit>().ToList();

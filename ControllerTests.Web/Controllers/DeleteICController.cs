@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Mvc;
 using ControllerTests.Web.Models;
 using NHibernate;
 using NHibernate.Linq;
@@ -20,6 +22,9 @@ namespace ControllerTests.Web.Controllers
 
         public HttpResponseMessage Post(int id)
         {
+            if (Request.RequestUri.Scheme != Uri.UriSchemeHttps)
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+
             var ic = _session.Query<IntegratedCircuit>().SingleOrDefault(i => i.Id == id);
 
             if (ic == null)
