@@ -13,6 +13,9 @@ namespace ControllerTests
     /// <typeparam name="TSession">The contract which allows you to set up and assert state changes. eg. database connection, ORM session abstraction.</typeparam>
     public abstract class AnyControllerTestBase<TSystem, TSession> : IDisposable
     {
+        // todo: consider renaming TSession to TStore? Does it make more sense since the type might not look right
+        // to some devs as 'Session'. Or is it important that we make it clear that the instance is a Unit Of Work (hence 'session')?
+
         private bool _disposed;
         private readonly Lazy<TSystem> _system;
         private TSession _session;
