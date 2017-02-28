@@ -14,4 +14,12 @@ TODO: confidence, ROI, etc
 
 # Examples
 
-TODO
+## MVC controller
+
+* [HomeControllerTests.cs](https://github.com/cottsak/ControllerTests/blob/master/ControllerTests.Tests/HomeControllerTests.cs) 
+
+## WebApi controller
+
+* [IcResourceTests.cs](https://github.com/cottsak/ControllerTests/blob/master/ControllerTests.Tests/IcResourceTests.cs) 
+* [DeleteICControllerTests.cs](https://github.com/cottsak/ControllerTests/blob/master/ControllerTests.Tests/DeleteICControllerTests.cs)
+* [DevAccessResourceTests.cs](https://github.com/cottsak/ControllerTests/blob/master/ControllerTests.Tests/DevAccessResourceTests.cs)
