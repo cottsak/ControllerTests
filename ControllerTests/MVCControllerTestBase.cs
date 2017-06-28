@@ -120,7 +120,8 @@ namespace ControllerTests
             {
                 if (_setup.SessionTeardown != null)
                     _setup.SessionTeardown(Session);
-                _httpRequest.Dispose();
+                if (_httpRequest != null)
+                    _httpRequest.Dispose();
             }
 
             _disposed = true;
